@@ -1,0 +1,107 @@
+// ---------------------------------------------------------------------------
+// ASSET-KEY LAYER
+// Every art/sound asset is referenced by a KEY only. When the real files
+// arrive, they go into public/assets/ and get ONE line in ASSET_MANIFEST;
+// any key not in the manifest is drawn as a colored-rectangle placeholder,
+// so swapping in real art later touches ONLY this file.
+//
+// Planned keys (fill in as files are uploaded):
+//   player   : { src: 'assets/characters/player.png', frameWidth: 16, frameHeight: 16 }
+//   tiles    : { src: 'assets/tiles/sproutlands_tiles.png', frameWidth: 16, frameHeight: 16 }
+//   farm     : { src: 'assets/maps/farm.json' }            (Tiled JSON)
+//   sfx      : { src: 'assets/sfx/kenney_*.ogg' }
+// ---------------------------------------------------------------------------
+
+export const ASSET_MANIFEST = {
+  // Tiled map (real file). Tile ids inside it match the tileset below.
+  map_farm: { type: 'tilemap', src: 'assets/maps/farm.json' },
+  map_village: { type: 'tilemap', src: 'assets/maps/village.json' },
+
+  // Real art — Cute Fantasy (Kenmi), 16x16 tiles / 32x32 character frames.
+  tiles_farm: { type: 'image', src: 'assets/tiles/farm_tiles.png' },
+  soil_dry: { type: 'image', src: 'assets/tiles/soil_dry.png' },
+  soil_wet: { type: 'image', src: 'assets/tiles/soil_wet.png' },
+  player: { type: 'spritesheet', src: 'assets/characters/player.png', frameWidth: 32, frameHeight: 32 },
+
+  // Crop growth stages — Sunnyside World, one 16x16 frame per stage.
+  cropsheet_carrot: { type: 'spritesheet', src: 'assets/crops/carrot.png', frameWidth: 16, frameHeight: 16 },
+  cropsheet_corn: { type: 'spritesheet', src: 'assets/crops/corn.png', frameWidth: 16, frameHeight: 16 },
+  cropsheet_chili: { type: 'spritesheet', src: 'assets/crops/chili.png', frameWidth: 16, frameHeight: 16 },
+  cropsheet_tomato: { type: 'spritesheet', src: 'assets/crops/tomato.png', frameWidth: 16, frameHeight: 16 },
+
+  // Animals — Cute Fantasy (Kenmi), 2x2 frames of 32x32 (0-1 idle, 2-3 walk, facing left).
+  animal_chicken: { type: 'spritesheet', src: 'assets/animals/chicken.png', frameWidth: 32, frameHeight: 32 },
+  animal_cow: { type: 'spritesheet', src: 'assets/animals/cow.png', frameWidth: 32, frameHeight: 32 },
+
+  // Item icons (16x16) — Sunnyside World. Key = `item_<id>`; others are still code-drawn.
+  item_egg: { type: 'image', src: 'assets/items/egg.png' },
+  item_milk: { type: 'image', src: 'assets/items/milk.png' },
+
+  // Sound — Kenney (CC0)
+  sfx_click: { type: 'audio', src: 'assets/sfx/sfx_click.ogg' },
+  sfx_till: { type: 'audio', src: 'assets/sfx/sfx_till.ogg' },
+  sfx_plant: { type: 'audio', src: 'assets/sfx/sfx_plant.ogg' },
+  sfx_water: { type: 'audio', src: 'assets/sfx/sfx_water.ogg' },
+  sfx_harvest: { type: 'audio', src: 'assets/sfx/sfx_harvest.ogg' },
+  sfx_coins: { type: 'audio', src: 'assets/sfx/sfx_coins.ogg' },
+  sfx_door: { type: 'audio', src: 'assets/sfx/sfx_door.ogg' },
+  sfx_deny: { type: 'audio', src: 'assets/sfx/sfx_deny.ogg' },
+  jingle_quest: { type: 'audio', src: 'assets/sfx/jingle_quest.ogg' },
+  jingle_day: { type: 'audio', src: 'assets/sfx/jingle_day.ogg' }
+};
+
+export function hasRealAsset(key) {
+  return !!ASSET_MANIFEST[key];
+}
+
+// Queue the real files for the given keys (call from a scene's preload()).
+// Keys without a manifest entry are skipped -> the scene draws a placeholder.
+export function preloadAssets(scene, keys) {
+  keys.forEach((key) => {
+    const a = ASSET_MANIFEST[key];
+    if (!a || scene.textures.exists(key) || scene.cache.tilemap.exists(key)
+      || scene.cache.audio.exists(key)) return;
+    if (a.type === 'tilemap') scene.load.tilemapTiledJSON(key, a.src);
+    else if (a.type === 'audio') scene.load.audio(key, a.src);
+    else if (a.type === 'spritesheet') {
+      scene.load.spritesheet(key, a.src, { frameWidth: a.frameWidth, frameHeight: a.frameHeight });
+    } else scene.load.image(key, a.src);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// WARM TINT option — a global warm overlay that fixes over-bright pastel
+// palettes (placeholder art and Sprout Lands both read too cold/bright).
+// Stored separately from the save so it survives "New game".
+// ---------------------------------------------------------------------------
+
+const WARM_KEY = 'rob_warm';
+
+export function warmEnabled() {
+  try {
+    const v = localStorage.getItem(WARM_KEY);
+    if (v === '0') return false;
+    if (v === '1') return true;
+  } catch (e) { /* storage blocked */ }
+  return true; // default ON
+}
+
+export function setWarm(on) {
+  try { localStorage.setItem(WARM_KEY, on ? '1' : '0'); } catch (e) { /* ignore */ }
+}
+
+// Full-screen warm overlay pinned to the screen (scrollFactor 0).
+// depth 900 = above the world, below the HUD (depth 1000). Idempotent.
+export function applyWarmTint(scene) {
+  if (!warmEnabled() || scene.warmTint) return;
+  const rect = scene.add.rectangle(240, 135, 480, 270, 0xffc98a, 0.32)
+    .setScrollFactor(0)
+    .setDepth(900)
+    .setBlendMode(Phaser.BlendModes.MULTIPLY);
+  scene.warmTint = rect;
+  scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+    rect.destroy();
+    scene.warmTint = null;
+  });
+  return rect;
+}

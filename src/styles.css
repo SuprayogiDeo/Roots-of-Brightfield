@@ -1,0 +1,118 @@
+/* Global mobile robustness: no selection, no callout, no zoom, no overscroll */
+html,
+body,
+canvas,
+#game,
+#rotate {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #2b1d12;
+}
+
+/* Game area respects notches / safe areas (landscape) */
+#game {
+  position: fixed;
+  top: env(safe-area-inset-top, 0px);
+  right: env(safe-area-inset-right, 0px);
+  bottom: env(safe-area-inset-bottom, 0px);
+  left: env(safe-area-inset-left, 0px);
+}
+
+canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* The ONLY place where text selection is allowed (e.g. the name input overlay) */
+.allow-select,
+.allow-select * ,
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+  touch-action: auto;
+}
+
+/* Name input overlay (positioned over the canvas by CharacterSelectScene) */
+.name-input {
+  position: fixed;
+  z-index: 50;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 6px;
+  background: #f6e7c1;
+  color: #2b1d12;
+  border: 2px solid #854f0b;
+  border-radius: 0;
+  outline: none;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.name-input::placeholder {
+  color: #a58d62;
+}
+.name-input:focus {
+  border-color: #ef9f27;
+}
+.name-input.shake {
+  animation: shake 0.3s;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* Portrait overlay */
+#rotate {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #2b1d12;
+  color: #f6e7c1;
+  font-family: monospace;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 24px;
+}
+#rotate p {
+  margin: 8px 0;
+  font-size: 18px;
+}
+#rotate .sub {
+  font-size: 14px;
+  opacity: 0.75;
+}
+.rotate-icon {
+  font-size: 64px;
+  color: #ef9f27;
+  animation: spin 2.5s ease-in-out infinite;
+}
+@keyframes spin {
+  0%, 20% { transform: rotate(0deg); }
+  80%, 100% { transform: rotate(-90deg); }
+}
+
+@media (orientation: portrait) {
+  #rotate { display: flex; }
+  #game { visibility: hidden; }
+}
