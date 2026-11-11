@@ -152,8 +152,30 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
   - Files: `public/assets/characters/player_actions.png`, `src/systems/toolAnim.js` (new), `assets.js` (manifest key
     `player_actions`), `farmArt.js` (`idleFrameFor`), `FarmScene.js`.
 
+- **Step 4.4 — Fishing animation (no new art, all code)**
+  - **Part 1 — pose + line + bobber** (`src/systems/fishingPose.js`, new): while fishing the player freezes on the idle
+    frame of the facing direction and holds the existing `item_fishing_rod` icon, rotated so the rod points at the water
+    (per-facing hand position + aim angle; left = mirrored with `scaleX -1`). The icon has a line + bobber baked in, so a
+    masked canvas copy `rod_held` (created at runtime) keeps only the bent rod; the code-drawn line starts at the rod tip.
+    Rod is drawn behind the player when facing up. If the real player sprite or the rod icon is missing, it falls back to
+    the old line from the player's head.
+  - New cast sequence in `fishing.js` (state `cast`, 520 ms, Tap A ignored meanwhile): rod back-swing -> whip forward
+    (180 ms), bobber flies in an arc to the water tile (340 ms), **splash on landing**, then the wait starts (the
+    "Waiting..." toast now shows on landing). Line is a sagging curve from tip to bobber (loose while waiting, tight when
+    reeling). Wait = bobber bobs + slow sway + a faint ripple every ~1.5 s. Bite = **"!" bounces**, bobber dips fast, rod
+    trembles. Reel = bobber shakes, and **each successful hit yanks** the rod and bobber.
+  - **Part 2 — splash + jumping fish** (`src/systems/fishingFx.js`, new): `splash` (droplets + rings, big on landing /
+    small on bite, reel hit, early press, escape), `ripple`, and `fishJump`: on a catch the rod snaps up, the fish icon
+    leaps out of the water in an arc, spins, follows the player and shrinks into them, then floating **"+1"** appears
+    (Golden Carp also gets sparkles). Bag full = old deny blip and no jump (`catchFish` now returns true/false).
+  - Other changes: `toolAnim.js` now exports `arc` and `twinkle` (reused by the splash); `BeachScene` passes
+    `player` to `FishingGame` and calls `fishing.start(target, facing)` (signature changed: no more `from` getter).
+  - Rules unchanged: walking away while waiting cancels, Tap A too early scares the fish, minigame numbers untouched.
+  - Not checked in a real browser from the sandbox (logic was run against a stubbed Phaser; rod angles were previewed
+    with the same math). **Tune on the phone** if needed: `HAND` / `AIM` in `fishingPose.js`, `CAST_*` / `WINDUP_DEG` in
+    `fishing.js`.
+
 ## NEXT
-- **Step 4.4** — Fishing animation (code-drawn: rod pose, line, bobber, splash, jumping fish).
 - **Step 4.5** — Mining: select Pickaxe, face a node, Tap A -> swing animation (`rig.playTool('pickaxe')`), shake, 3 hits, drops ore/stone (+XP),
   node turns to rubble and respawns next day; mined nodes saved (new save schema version).
 - Then: crafting (furnace: ore -> bars), forest foraging/chopping, village house interiors, second quest chain.

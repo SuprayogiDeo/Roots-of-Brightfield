@@ -112,6 +112,7 @@ export default class BeachScene extends Phaser.Scene {
     this.hud = new Hud(this, save, { onMenu: () => { this.persist(); goTo(this, 'Menu', { from: 'Beach' }); } });
     this.fishing = new FishingGame(this, {
       getLevel: () => this.save.xp.level,
+      player: this.player,
       onCatch: (id) => this.catchFish(id),
       onFail: (key) => { playSfx(this, 'sfx_deny'); this.hud.toast(t(key), '#C4553F'); }
     });
@@ -169,7 +170,7 @@ export default class BeachScene extends Phaser.Scene {
     if (left > 0) {
       playSfx(this, 'sfx_deny');
       this.hud.toast(t('msg.bagFull'), '#C4553F');
-      return;
+      return false; // no fish-jump effect when the bag is full
     }
     playSfx(this, 'sfx_harvest');
     this.hud.toast(t('fish.caught', { name: fishName(id) }), '#639922');
@@ -183,6 +184,7 @@ export default class BeachScene extends Phaser.Scene {
       });
     }
     this.persist();
+    return true;
   }
 
   // ---------------- interactions ----------------
@@ -196,7 +198,7 @@ export default class BeachScene extends Phaser.Scene {
     if (this.rodSelected()) {
       const target = this.waterAhead();
       if (target) {
-        this.fishing.start(target, () => ({ x: this.player.x, y: this.player.y }));
+        this.fishing.start(target, this.facing);
         return;
       }
     }

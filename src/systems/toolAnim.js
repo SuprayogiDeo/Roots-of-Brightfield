@@ -123,7 +123,7 @@ const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 // A bit flies up in an arc, falls, and fades.
-function arc(scene, x, y, tex, tint, { dx, peak, fall, up = 170, down = 230 }) {
+export function arc(scene, x, y, tex, tint, { dx, peak, fall, up = 170, down = 230 }) {
   const img = scene.add.image(x, y, tex).setTint(tint).setDepth(2000);
   scene.tweens.add({ targets: img, x: x + dx, duration: up + down, ease: 'Linear' });
   scene.tweens.add({
@@ -141,7 +141,7 @@ function arc(scene, x, y, tex, tint, { dx, peak, fall, up = 170, down = 230 }) {
 }
 
 // A sparkle grows, floats up and vanishes.
-function twinkle(scene, x, y, tint, delay = 0) {
+export function twinkle(scene, x, y, tint, delay = 0) {
   const img = scene.add.image(x, y, 'fx_spark').setTint(tint).setDepth(2001).setScale(0.2).setAlpha(0);
   scene.tweens.add({
     targets: img,
