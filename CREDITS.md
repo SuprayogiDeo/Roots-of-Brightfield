@@ -61,9 +61,16 @@ Used for: crop growth stages.
   `4 Icons`), the boat and barrels (`public/assets/beach/boat.png`, `barrel1/2.png`).
 - Not used (yet): `Beach.zip` (sand-castle sprite sheets), the Fisherman character animations.
 
+### Forest (Step 4.1b)
+- **Pixel Crawler — Free Pack (Exterior 0.1)** by **Anokolisa** (credit appreciated, not required; commercial use of the
+  game is allowed, but the assets themselves may not be resold or redistributed as an asset pack).
+  Used for: tree, bush, rock, flower, mushroom and fern sprites (`public/assets/forest/*.png`, cropped from
+  `Environment/Props/Static/*`). `public/assets/tiles/forest_tiles.png` (grass + dirt-trail autotile) is generated
+  from the pack's grass and dirt colour palettes.
+
 ### Not used yet (kept out of the repo until needed)
 - The rest of **Sunnyside World** (village, NPCs, UI) — planned for Phase 2.
-- **Pixel Crawler — Free Pack (Exterior 0.1)** — candidate for the Mine / Forest.
+- The rest of **Pixel Crawler** (dungeon tiles, mobs, NPCs) — candidate for the Mine.
 - The Sunnyside `.aseprite` character file (source file, not needed at runtime).
 
 ## Code

@@ -105,6 +105,14 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
     crops. +3 XP per catch. Level adds a little to the green zone width.
   - Real icons for the 6 fish + Fishing Rod. New texts in EN/ID.
 
+- **Step 4.1b — Forest map + transition**
+  - New `ForestScene` (`maps/forest.json` 40x30, tileset `forest_tiles.png`): winding dirt trail, dense oak/pine border,
+    bushes, rocks, flowers/ferns/mushrooms, and a mushroom clearing in the north. Props live in the map's `Props`
+    object layer (solid footprints in `ForestScene.js` `SOLID`; flowers/ferns/mushrooms are decoration).
+  - Transition: a gate gap in the Farm's north fence (`to_forest`, x 272-368, y 0-14) <-> Forest south edge (`to_farm`).
+    Points `from_forest` (Farm) / `from_farm` (Forest). Title "Continue" resumes in the Forest if saved there.
+  - The forest is empty of gameplay for now (no chopping/foraging yet) — planned next.
+
 ## NEXT (Step 4.2)
 - Village house interiors, a second quest chain, real item icons (UI pack), NPC art.
 - Phase 4: Forest / Mine, mining, crafting; fish quest / recipes; beach NPC; shells to collect.

@@ -1036,10 +1036,10 @@
     7,
     7,
     7,
-    7,
-    7,
-    7,
-    7,
+    0,
+    0,
+    0,
+    0,
     7,
     7,
     7,
@@ -2048,6 +2048,24 @@
        "value": "to_beach"
       }
      ]
+    },
+    {
+     "id": 24,
+     "name": "to_forest",
+     "type": "",
+     "x": 272,
+     "y": 0,
+     "width": 96,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "action",
+       "type": "string",
+       "value": "to_forest"
+      }
+     ]
     }
    ]
   },
@@ -2108,12 +2126,24 @@
      "rotation": 0,
      "visible": true,
      "properties": []
+    },
+    {
+     "id": 25,
+     "name": "from_forest",
+     "type": "",
+     "x": 320,
+     "y": 42,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "properties": []
     }
    ]
   }
  ],
  "nextlayerid": 5,
- "nextobjectid": 24,
+ "nextobjectid": 26,
  "orientation": "orthogonal",
  "renderorder": "right-down",
  "tiledversion": "1.10.2",
