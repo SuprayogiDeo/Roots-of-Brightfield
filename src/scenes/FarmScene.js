@@ -11,7 +11,7 @@ import { ITEMS, addItem, consumeSlot } from '../systems/items.js';
 import { advanceQuest, questObjectiveKey, QUEST_REWARD } from '../systems/quests.js';
 import { playSfx, SFX_KEYS } from '../systems/audio.js';
 import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
-import { AnimalManager, ANIMALS } from '../systems/animals.js';
+import { AnimalManager, ANIMALS, newAnimal } from '../systems/animals.js';
 import { addXp, XP_GAIN } from '../systems/xp.js';
 
 const DOOR_CLOSED = 13; // gid in farm.json
@@ -20,7 +20,6 @@ const DIRT_GID = 4; // tillable ground tile
 const CLOCK_STEP_MS = 7000; // 10 in-game minutes every 7 real seconds
 const DAY_END = 26 * 60; // 02:00 AM -> the player passes out
 const AUTOSAVE_MS = 30000;
-const COST = { till: 3, plant: 1, water: 2, harvest: 1, feed: 1, collect: 1 };
 
 const propOf = (obj, name) => ((obj.properties || []).find((p) => p.name === name) || {}).value;
 
@@ -39,6 +38,7 @@ export default class FarmScene extends Phaser.Scene {
   }
 
   create() {
+    this.leaving = false;
     const save = loadSave();
     if (!save) { this.scene.start('Title'); return; }
     this.save = save;
@@ -187,9 +187,6 @@ export default class FarmScene extends Phaser.Scene {
   }
 
   doFarmAction(act) {
-    const stam = this.save.stamina;
-    const cost = COST[act.kind] || 0;
-    if (stam.cur < cost) { this.hud.toast(t('msg.tired'), '#C4553F'); playSfx(this, 'sfx_deny'); return; }
     const plots = this.save.plots;
     const inv = this.save.inventory;
 
@@ -216,7 +213,6 @@ export default class FarmScene extends Phaser.Scene {
     }
 
     playSfx(this, `sfx_${act.kind}`);
-    stam.cur = Math.max(0, stam.cur - cost);
     this.hud.refresh();
     if (plots[act.key]) this.drawPlot(act.key);
     this.pulse(0xf6e7c1);
@@ -244,9 +240,7 @@ export default class FarmScene extends Phaser.Scene {
       this.hud.toast(act.a.data.fed ? t('msg.animalHappy', { name: def.name }) : t('msg.needFeed'), '#F6E7C1');
       return;
     }
-    const stam = this.save.stamina;
     const inv = this.save.inventory;
-    if (stam.cur < COST[act.kind]) { this.hud.toast(t('msg.tired'), '#C4553F'); playSfx(this, 'sfx_deny'); return; }
     if (act.kind === 'feed') {
       consumeSlot(inv, inv.row * HOTBAR_SIZE + inv.sel);
       act.a.data.fed = true;
@@ -258,7 +252,6 @@ export default class FarmScene extends Phaser.Scene {
       this.hud.toast(`+1 ${ITEMS[def.product].name}`, '#639922');
       playSfx(this, 'sfx_harvest');
     }
-    stam.cur = Math.max(0, stam.cur - COST[act.kind]);
     this.animals.refreshBubble(act.a);
     this.hud.refresh();
     this.pulse(0xf6e7c1);
@@ -363,7 +356,6 @@ export default class FarmScene extends Phaser.Scene {
     const save = this.save;
     save.time.day += 1;
     save.time.minutes = 360; // 06:00 AM
-    save.stamina.cur = passedOut ? Math.round(save.stamina.max * 0.6) : save.stamina.max;
     Object.keys(save.plots).forEach((key) => {
       const plot = save.plots[key];
       if (plot.crop && plot.watered) plot.grown = Math.min(plot.grown + 1, CROPS[plot.crop].days);
@@ -384,6 +376,11 @@ export default class FarmScene extends Phaser.Scene {
     this.hud.refresh();
     if (finished) {
       playSfx(this, 'jingle_quest');
+      const hen = newAnimal('chicken');
+      this.save.animals.push(hen);
+      this.animals.spawn(hen);
+      addItem(this.save.inventory, 'animal_feed', 3);
+      this.hud.refreshHotbar();
       this.hud.showMessage(t('quest.shed.complete', { coins: QUEST_REWARD }));
       this.hud.toast(`+${QUEST_REWARD}g`, '#EF9F27');
     }

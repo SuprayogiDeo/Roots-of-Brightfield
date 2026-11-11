@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { centerCamera } from '../systems/ui.js';
 import { t } from '../i18n/index.js';
 import { makeText, makeButton, addLangToggle, goTo } from '../systems/ui.js';
 import { drawLogo } from '../systems/placeholderArt.js';
@@ -10,6 +11,7 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   create() {
+    centerCamera(this);
     this.leaving = false;
     this.confirm = null;
     this.cameras.main.setBackgroundColor('#2b1d12');

@@ -22,7 +22,7 @@ function mixColor(c1, c2, f) {
 }
 
 export function createNightOverlay(scene) {
-  const o = scene.add.rectangle(0, 0, 480, 270, 0x1b2a4a, 0)
+  const o = scene.add.rectangle(0, 0, scene.scale.width, 270, 0x1b2a4a, 0)
     .setOrigin(0).setScrollFactor(0).setDepth(900);
   scene.nightOverlay = o;
   return o;

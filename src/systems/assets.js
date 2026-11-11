@@ -94,7 +94,8 @@ export function setWarm(on) {
 // depth 900 = above the world, below the HUD (depth 1000). Idempotent.
 export function applyWarmTint(scene) {
   if (!warmEnabled() || scene.warmTint) return;
-  const rect = scene.add.rectangle(240, 135, 480, 270, 0xffc98a, 0.32)
+  const rect = scene.add.rectangle(0, 0, scene.scale.width, 270, 0xffc98a, 0.32)
+    .setOrigin(0)
     .setScrollFactor(0)
     .setDepth(900)
     .setBlendMode(Phaser.BlendModes.MULTIPLY);

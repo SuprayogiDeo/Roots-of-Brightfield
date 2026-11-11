@@ -27,6 +27,7 @@ export default class VillageScene extends Phaser.Scene {
   }
 
   create() {
+    this.leaving = false;
     const save = loadSave();
     if (!save) { this.scene.start('Title'); return; }
     this.save = save;

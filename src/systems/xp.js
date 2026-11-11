@@ -1,13 +1,9 @@
-// XP / level system. Level 1..MAX_LEVEL. Each level raises max stamina by 10.
+// XP / level system. Level 1..MAX_LEVEL (rewards for levels come in later phases).
 export const MAX_LEVEL = 10;
 
 // XP needed to go from `level` to `level + 1` (20, 35, 50, ...).
 export function xpNeeded(level) {
   return 20 + (level - 1) * 15;
-}
-
-export function staminaMaxFor(level) {
-  return 100 + (level - 1) * 10;
 }
 
 // XP rewards per action.
@@ -23,8 +19,6 @@ export function addXp(save, amount) {
     x.xp -= xpNeeded(x.level);
     x.level += 1;
     leveled = true;
-    save.stamina.max = staminaMaxFor(x.level);
-    save.stamina.cur = Math.min(save.stamina.max, save.stamina.cur + 10);
   }
   if (x.level >= MAX_LEVEL) x.xp = 0;
   return { leveled, level: x.level };

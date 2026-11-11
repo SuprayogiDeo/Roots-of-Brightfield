@@ -62,7 +62,7 @@
   "quest.shed.water": "Water the planted crop",
   "quest.shed.harvest": "Harvest a ripe crop",
   "quest.shed.sell": "Sell it at the Shipping Bin",
-  "quest.shed.complete": "Quest complete! Grandpa's notebook opens. (+{coins}g)",
+  "quest.shed.complete": "Quest complete! Grandpa's notebook opens. (+{coins}g) A chicken and 3 Animal Feed are waiting for you in the south meadow!",
   "sign.bin": "Shipping Bin",
   "settings.sound": "Sound",
   "prompt.toVillage": "Go to Brightfield Village",
@@ -116,9 +116,13 @@
   "skills.max": "Max level reached",
   "skills.stamina": "Stamina {cur}/{max}",
   "skills.coins": "Coins {coins}g",
-  "skills.hint": "Every level adds +10 max stamina. Farm, feed and harvest to earn XP.",
+  "skills.hint": "Level up by farming, feeding animals and harvesting. More rewards are coming!",
   "quests.none": "No active quest.",
   "map.soon": "Map coming soon.",
   "shop.max": "Max",
-  "shop.bagUpgraded": "Backpack upgraded to {size} slots!"
+  "shop.bagUpgraded": "Backpack upgraded to {size} slots!",
+  "settings.controls": "Control size",
+  "settings.size.s": "Small",
+  "settings.size.m": "Medium",
+  "settings.size.l": "Large"
 }

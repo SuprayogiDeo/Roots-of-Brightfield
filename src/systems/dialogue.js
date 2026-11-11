@@ -3,12 +3,13 @@ import { playSfx } from './audio.js';
 
 // Dialogue box: portrait left, name tab above, text centre, choices on the right.
 // All elements are camera-fixed (scrollFactor 0) and sit above the day-night overlay.
-const BOX = { x: 8, y: 188, w: 464, h: 74 };
+const BOX0 = { x: 8, y: 188, w: 464, h: 74 };
 const D = 1400; // above the HUD and the night overlay
 
 export default class Dialogue {
   constructor(scene) {
     this.scene = scene;
+    const BOX = { ...BOX0, x: Math.round((scene.scale.width - BOX0.w) / 2) };
     this.open = false;
     this.lines = [];
     this.index = 0;

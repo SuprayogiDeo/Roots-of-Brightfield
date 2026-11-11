@@ -62,7 +62,7 @@
   "quest.shed.water": "Siram tanaman yang baru ditanam",
   "quest.shed.harvest": "Panen tanaman yang sudah matang",
   "quest.shed.sell": "Jual di Shipping Bin",
-  "quest.shed.complete": "Misi selesai! Buku catatan Kakek terbuka. (+{coins}g)",
+  "quest.shed.complete": "Misi selesai! Buku catatan Kakek terbuka. (+{coins}g) Seekor ayam dan 3 Animal Feed menunggumu di padang selatan!",
   "sign.bin": "Shipping Bin",
   "settings.sound": "Suara",
   "prompt.toVillage": "Pergi ke Brightfield Village",
@@ -116,9 +116,13 @@
   "skills.max": "Level maksimal tercapai",
   "skills.stamina": "Stamina {cur}/{max}",
   "skills.coins": "Koin {coins}g",
-  "skills.hint": "Setiap level menambah +10 stamina maksimal. Bertani, beri makan, dan panen untuk dapat XP.",
+  "skills.hint": "Naik level dengan bertani, memberi makan hewan, dan memanen. Hadiah lain segera hadir!",
   "quests.none": "Tidak ada misi aktif.",
   "map.soon": "Peta segera hadir.",
   "shop.max": "Maks",
-  "shop.bagUpgraded": "Tas ditingkatkan menjadi {size} slot!"
+  "shop.bagUpgraded": "Tas ditingkatkan menjadi {size} slot!",
+  "settings.controls": "Ukuran kontrol",
+  "settings.size.s": "Kecil",
+  "settings.size.m": "Sedang",
+  "settings.size.l": "Besar"
 }

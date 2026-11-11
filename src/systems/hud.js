@@ -1,6 +1,6 @@
 import { playSfx } from './audio.js';
 import { t } from '../i18n/index.js';
-import { makeText } from './ui.js';
+import { makeText, getSafe } from './ui.js';
 import { ITEMS, createItemIcons } from './items.js';
 import { xpNeeded, MAX_LEVEL } from './xp.js';
 
@@ -13,14 +13,12 @@ import { xpNeeded, MAX_LEVEL } from './xp.js';
 
 const M = 11;
 const D = 1000;
-const SLOT = 20;
+const SLOT = 24;
 const GAP = 2;
 export const HOTBAR_SIZE = 6;
 export const BAG_ROWS = 3;
 const BAR_W = HOTBAR_SIZE * SLOT + (HOTBAR_SIZE - 1) * GAP; // 130
-const BAR_X = 240 - BAR_W / 2;
 const BAR_Y = 270 - M - SLOT;
-const STAM_W = 66;
 
 export function formatTime(minutes) {
   const h24 = Math.floor(minutes / 60) % 24;
@@ -35,31 +33,36 @@ export default class Hud {
     this.scene = scene;
     this.save = save;
     createItemIcons(scene);
+    const W = scene.scale.width;
+    const safe = getSafe(scene);
+    const ML = M + safe.l;
+    const MR = M + safe.r;
+    const CX = W / 2;
+    const BAR_X = CX - BAR_W / 2;
+    this.barX = BAR_X;
     const fix = (o, depth = D) => o.setScrollFactor(0).setDepth(depth);
 
     // --- top-left: date / time / stamina ---
-    this.datePanel = fix(scene.add.rectangle(M, M, 160, 43, 0x2b1d12, 0.72)
+    this.datePanel = fix(scene.add.rectangle(ML, M, 160, 43, 0x2b1d12, 0.72)
       .setOrigin(0).setStrokeStyle(1, 0x854f0b));
-    this.dateTxt = fix(makeText(scene, M + 6, M + 6, '', 8, '#F6E7C1', { origin: [0, 0] }), D + 1);
-    this.timeTxt = fix(makeText(scene, M + 6, M + 19, '', 8, '#EF9F27', { origin: [0, 0] }), D + 1);
-    fix(scene.add.rectangle(M + 82, M + 19, STAM_W + 2, 7, 0x1a120b)
-      .setOrigin(0).setStrokeStyle(1, 0x854f0b), D + 1);
-    this.stamFill = fix(scene.add.rectangle(M + 83, M + 20, STAM_W, 5, 0x639922).setOrigin(0), D + 2);
-    this.lvTxt = fix(makeText(scene, M + 6, M + 32, '', 8, '#F6E7C1', { origin: [0, 0] }), D + 1);
-    fix(scene.add.rectangle(M + 50, M + 32, 100, 7, 0x1a120b).setOrigin(0).setStrokeStyle(1, 0x854f0b), D + 1);
-    this.xpFill = fix(scene.add.rectangle(M + 51, M + 33, 98, 5, 0x5b9bd5).setOrigin(0), D + 2);
+    this.dateTxt = fix(makeText(scene, ML + 6, M + 6, '', 8, '#F6E7C1', { origin: [0, 0] }), D + 1);
+    this.timeTxt = fix(makeText(scene, ML + 6, M + 19, '', 8, '#EF9F27', { origin: [0, 0] }), D + 1);
+    this.lvTxt = fix(makeText(scene, ML + 6, M + 32, '', 8, '#F6E7C1', { origin: [0, 0] }), D + 1);
+    fix(scene.add.rectangle(ML + 50, M + 32, 100, 7, 0x1a120b).setOrigin(0).setStrokeStyle(1, 0x854f0b), D + 1);
+    this.xpFill = fix(scene.add.rectangle(ML + 51, M + 33, 98, 5, 0x5b9bd5).setOrigin(0), D + 2);
 
     // --- top-right: menu button + coins ---
-    const mx = 480 - M - 22;
-    const menuBg = fix(scene.add.rectangle(mx, M, 22, 22, 0x2b1d12, 0.72)
+    const mx = W - MR - 26;
+    const menuBg = fix(scene.add.rectangle(mx, M, 26, 26, 0x2b1d12, 0.72)
       .setOrigin(0).setStrokeStyle(1, 0x854f0b)).setInteractive({ useHandCursor: true });
-    [6, 10, 14].forEach((y) => fix(scene.add.rectangle(mx + 5, M + y, 12, 2, 0xf6e7c1).setOrigin(0), D + 1));
+    [8, 12, 16].forEach((y) => fix(scene.add.rectangle(mx + 7, M + y, 12, 2, 0xf6e7c1).setOrigin(0), D + 1));
     menuBg.on('pointerdown', () => menuBg.setFillStyle(0x854f0b, 0.9));
     menuBg.on('pointerout', () => menuBg.setFillStyle(0x2b1d12, 0.72));
     menuBg.on('pointerup', () => { menuBg.setFillStyle(0x2b1d12, 0.72); playSfx(scene, 'sfx_click'); onMenu(); });
     this.menuBtn = menuBg;
 
     const cx = mx - 4 - 74;
+    // (coin panel is 22 high; the menu button next to it is 26 high for bigger touch target)
     fix(scene.add.rectangle(cx, M, 74, 22, 0x2b1d12, 0.72).setOrigin(0).setStrokeStyle(1, 0x854f0b));
     fix(scene.add.circle(cx + 10, M + 11, 5, 0xef9f27).setStrokeStyle(1, 0x854f0b), D + 1);
     fix(scene.add.rectangle(cx + 10, M + 11, 1, 5, 0x854f0b), D + 2);
@@ -86,18 +89,18 @@ export default class Hud {
     this.rowTxt = fix(makeText(scene, BAR_X + BAR_W + 7, BAR_Y + SLOT / 2 + 1, '1', 8, '#F6E7C1', {
       origin: [0, 0.5], stroke: '#2b1d12', strokeThickness: 2
     }), D + 1);
-    this.nameTxt = fix(makeText(scene, 240, BAR_Y - 6, '', 8, '#F6E7C1', {
+    this.nameTxt = fix(makeText(scene, CX, BAR_Y - 6, '', 8, '#F6E7C1', {
       origin: [0.5, 1], stroke: '#2b1d12', strokeThickness: 3
     }), D + 1).setAlpha(0);
 
     // --- top-left (below the date panel): current quest objective ---
-    this.questBg = fix(scene.add.rectangle(M, M + 47, 10, 14, 0x2b1d12, 0.72)
+    this.questBg = fix(scene.add.rectangle(ML, M + 47, 10, 14, 0x2b1d12, 0.72)
       .setOrigin(0).setStrokeStyle(1, 0xef9f27)).setVisible(false);
-    this.questTxt = fix(makeText(scene, M + 5, M + 53, '', 8, '#EF9F27', { origin: [0, 0] }), D + 1)
+    this.questTxt = fix(makeText(scene, ML + 5, M + 53, '', 8, '#EF9F27', { origin: [0, 0] }), D + 1)
       .setVisible(false);
 
     // --- floating toast (rewards / short feedback) ---
-    this.toastTxt = fix(makeText(scene, 240, BAR_Y - 34, '', 8, '#F6E7C1', {
+    this.toastTxt = fix(makeText(scene, CX, BAR_Y - 34, '', 8, '#F6E7C1', {
       origin: [0.5, 1], stroke: '#2b1d12', strokeThickness: 3
     }), D + 7).setAlpha(0);
 
@@ -108,9 +111,9 @@ export default class Hud {
     this.setPrompt(null);
 
     // --- message box (temporary until the real dialogue box arrives) ---
-    this.msgBg = fix(scene.add.rectangle(240, BAR_Y - 14, 320, 30, 0x2b1d12, 0.9)
+    this.msgBg = fix(scene.add.rectangle(CX, BAR_Y - 14, 320, 30, 0x2b1d12, 0.9)
       .setOrigin(0.5, 1).setStrokeStyle(1, 0xef9f27), D + 5).setInteractive().setVisible(false);
-    this.msgTxt = fix(makeText(scene, 240, BAR_Y - 22, '', 8, '#F6E7C1', {
+    this.msgTxt = fix(makeText(scene, CX, BAR_Y - 22, '', 8, '#F6E7C1', {
       origin: [0.5, 1], align: 'center', lineSpacing: 4, wordWrap: { width: 300, useAdvancedWrap: true }
     }), D + 6).setVisible(false);
     this.msgBg.on('pointerup', () => this.hideMessage());
@@ -122,8 +125,6 @@ export default class Hud {
   refresh() {
     this.refreshTime();
     const s = this.save;
-    this.stamFill.setSize(Math.max(0, Math.round(STAM_W * s.stamina.cur / s.stamina.max)), 5);
-    this.stamFill.setFillStyle(s.stamina.cur / s.stamina.max < 0.25 ? 0xc4553f : 0x639922);
     const xp = s.xp || { level: 1, xp: 0 };
     this.lvTxt.setText(`Lv ${xp.level}`);
     const ratio = xp.level >= MAX_LEVEL ? 1 : xp.xp / xpNeeded(xp.level);
@@ -147,7 +148,7 @@ export default class Hud {
       if (item) this.icons[i].setTexture(`item_${item.id}`);
       this.qtys[i].setText(item && item.qty > 1 ? String(item.qty) : '');
     }
-    this.selRect.x = BAR_X + inv.sel * (SLOT + GAP) - 1;
+    this.selRect.x = this.barX + inv.sel * (SLOT + GAP) - 1;
     this.rowTxt.setText(String(inv.row + 1));
   }
 

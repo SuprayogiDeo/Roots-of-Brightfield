@@ -61,6 +61,29 @@ export function goTo(scene, key, data) {
   scene.cameras.main.once('camerafadeoutcomplete', () => scene.scene.start(key, data));
 }
 
+// Menu-style scenes are laid out for 480x270. On a wider phone canvas, center them.
+export function centerCamera(scene) {
+  scene.cameras.main.setScroll(-Math.round((scene.scale.width - 480) / 2), 0);
+}
+
+// Notch / rounded-corner insets (left/right) converted to game units.
+export function getSafe(scene) {
+  let l = 0;
+  let r = 0;
+  try {
+    const d = document.createElement('div');
+    d.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;'
+      + 'padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)';
+    document.body.appendChild(d);
+    const cs = getComputedStyle(d);
+    const f = scene.scale.displayScale ? scene.scale.displayScale.x : 1;
+    l = Math.round((parseFloat(cs.paddingLeft) || 0) * f);
+    r = Math.round((parseFloat(cs.paddingRight) || 0) * f);
+    d.remove();
+  } catch (e) { /* no insets */ }
+  return { l, r };
+}
+
 // "EN | ID" toggle. Restarts the current scene so all labels refresh.
 export function addLangToggle(scene, x, y, depth = 0) {
   const cur = getLang();

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { centerCamera } from '../systems/ui.js';
 import { t } from '../i18n/index.js';
 import { makeText, makeButton, goTo } from '../systems/ui.js';
 import { preloadAssets } from '../systems/assets.js';
@@ -28,6 +29,8 @@ export default class ShopScene extends Phaser.Scene {
   }
 
   create() {
+    centerCamera(this);
+    this.leaving = false;
     const save = loadSave();
     if (!save) { this.scene.start('Title'); return; }
     this.save = save;

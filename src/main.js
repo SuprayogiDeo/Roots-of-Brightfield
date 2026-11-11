@@ -12,8 +12,34 @@ import ShopScene from './scenes/ShopScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import { setupMobileGuards, setupLifecycle } from './systems/mobile.js';
 
-const GAME_W = 480;
 const GAME_H = 270;
+
+// The game is always 270 high; the width follows the phone's aspect ratio (16:9 up to 21:9)
+// so the canvas fills the screen with no side bars.
+function computeWidth() {
+  const a = Math.max(window.innerWidth, window.innerHeight);
+  const b = Math.max(1, Math.min(window.innerWidth, window.innerHeight));
+  const aspect = Math.min(Math.max(a / b, 16 / 9), 21 / 9);
+  return Math.round((GAME_H * aspect) / 2) * 2;
+}
+
+// First tap on a touch device -> fullscreen (+ landscape lock where the browser allows it).
+// Turned off for good if the player switches fullscreen off in Settings.
+function setupAutoFullscreen(game) {
+  if (!game.device.input.touch || !game.device.fullscreen.available) return;
+  const standalone = window.matchMedia && window.matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches;
+  if (standalone) return;
+  const go = () => {
+    let off = false;
+    try { off = localStorage.getItem('rob_fs') === '0'; } catch (e) { /* ignore */ }
+    if (off || game.scale.isFullscreen) return;
+    try {
+      game.scale.startFullscreen();
+      if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
+    } catch (e) { /* ignore */ }
+  };
+  document.addEventListener('pointerup', go, { once: true });
+}
 
 setupMobileGuards();
 
@@ -36,7 +62,7 @@ async function start() {
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
-    width: GAME_W,
+    width: computeWidth(),
     height: GAME_H,
     backgroundColor: '#2b1d12',
     pixelArt: true,
@@ -54,6 +80,7 @@ async function start() {
       VillageScene, ShopScene, MenuScene]
   });
   setupLifecycle(game);
+  setupAutoFullscreen(game);
 }
 
 start();

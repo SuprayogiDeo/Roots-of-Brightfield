@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { centerCamera } from '../systems/ui.js';
 import { t } from '../i18n/index.js';
 import { makeText, makeButton, goTo } from '../systems/ui.js';
 import { loadSave, writeSave } from '../systems/save.js';
@@ -33,6 +34,7 @@ export default class MenuScene extends Phaser.Scene {
   }
 
   create() {
+    centerCamera(this);
     this.leaving = false;
     const save = loadSave();
     if (!save) { this.scene.start('Title'); return; }
@@ -100,7 +102,6 @@ export default class MenuScene extends Phaser.Scene {
     const lines = [
       t('skills.level', { level: x.level }),
       x.level >= MAX_LEVEL ? t('skills.max') : t('skills.xp', { xp: x.xp, need }),
-      t('skills.stamina', { cur: s.stamina.cur, max: s.stamina.max }),
       t('skills.coins', { coins: s.coins })
     ];
     lines.forEach((l, i) => this.keep(makeText(this, GX, 54 + i * 24, l, 8, '#F6E7C1', { origin: [0, 0.5] })));
@@ -222,11 +223,11 @@ export default class MenuScene extends Phaser.Scene {
       if (Math.hypot(p.x - this.press.x, p.y - this.press.y) < 5 || !inv.slots[this.press.i]) return;
       this.drag = {
         from: this.press.i,
-        ghost: this.add.image(p.x, p.y, `item_${inv.slots[this.press.i].id}`).setScale(1.25).setAlpha(0.9).setDepth(100)
+        ghost: this.add.image(p.worldX, p.worldY, `item_${inv.slots[this.press.i].id}`).setScale(1.25).setAlpha(0.9).setDepth(100)
       };
       this.refreshBag();
     }
-    this.drag.ghost.setPosition(p.x, p.y);
+    this.drag.ghost.setPosition(p.worldX, p.worldY);
   }
 
   onUp(p) {
@@ -237,7 +238,7 @@ export default class MenuScene extends Phaser.Scene {
       const from = this.drag.from;
       this.drag.ghost.destroy();
       this.drag = null;
-      const to = this.slotAt(p.x, p.y);
+      const to = this.slotAt(p.worldX, p.worldY);
       if (to >= 0 && to !== from) this.moveItem(from, to);
       else this.refreshBag();
       return;

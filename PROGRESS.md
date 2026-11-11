@@ -79,6 +79,18 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
     now cycles through however many rows the bag has (3 -> 6).
   - Fixed: date panel height reset to 32 on every refresh (the Lv/XP row was clipped).
 
+- **Step 3.3 — Phone fixes (from first live test)**
+  - Canvas width now follows the phone aspect (16:9 up to 21:9, height stays 270) -> no side bars; HUD,
+    controls, dialogue and night/warm overlays anchor to the real width and to notch safe-area insets.
+    Menu-style screens are centered. First tap on a touch device requests fullscreen (+ landscape lock where
+    allowed); switching fullscreen off in Settings stops that.
+  - Bigger touch controls + Settings > **Control size** (Small / Medium / Large, default Medium); menu button 26px,
+    hotbar slots 24px.
+  - Fixed: Menu could not be opened a 2nd time (Farm / Village / Shop forgot `this.leaving = false` in create()).
+  - **Stamina removed** (HUD bar, action costs, level bonus, Skills line). Save field kept for compatibility.
+  - Fence art rebuilt from the original Fences.png so horizontal rails connect; row-1 end posts replaced.
+  - Finishing the Old Shed quest now gives 1 Chicken + 3 Animal Feed so animals are visible early.
+
 ## NEXT (Step 3.3 / Phase 4 start)
 - Village house interiors, a second quest chain, real item icons (UI pack), NPC art.
 - Phase 4: Forest / Beach / Mine, fishing, mining, crafting.

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { centerCamera } from '../systems/ui.js';
 import { t } from '../i18n/index.js';
 import { makeText, makeButton, goTo } from '../systems/ui.js';
 import { drawPlayer } from '../systems/placeholderArt.js';
@@ -16,6 +17,7 @@ export default class CharacterSelectScene extends Phaser.Scene {
   }
 
   create() {
+    centerCamera(this);
     this.leaving = false;
     this.gender = 'male';
     this.entries = {};
@@ -107,9 +109,10 @@ export default class CharacterSelectScene extends Phaser.Scene {
     this.placeInput = () => {
       if (!this.nameEl) return;
       const r = this.game.canvas.getBoundingClientRect();
-      const k = r.width / GAME_W;
+      const k = r.width / this.scale.width;
+      const off = (this.scale.width - GAME_W) / 2;
       Object.assign(this.nameEl.style, {
-        left: `${r.left + NAME_BOX.x * k}px`,
+        left: `${r.left + (NAME_BOX.x + off) * k}px`,
         top: `${r.top + NAME_BOX.y * k}px`,
         width: `${NAME_BOX.w * k}px`,
         height: `${NAME_BOX.h * k}px`,
