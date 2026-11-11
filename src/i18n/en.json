@@ -138,5 +138,8 @@
   "fish.cancel": "You reel the line back in.",
   "prompt.toForest": "Enter the forest",
   "prompt.toFarmForest": "Go back to the farm",
-  "forest.arrive": "Tall trees, soft moss and mushrooms in the clearing. The forest is quiet... for now."
+  "forest.arrive": "Tall trees, soft moss and mushrooms in the clearing. The forest is quiet... for now.",
+  "prompt.toMine": "Enter the mine",
+  "prompt.leaveMine": "Leave the mine",
+  "mine.arrive": "Cool, dark and quiet. Lanterns flicker on the wall and ore glitters in the rock. (Mining arrives in the next update.)"
 }

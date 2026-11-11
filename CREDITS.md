@@ -68,9 +68,26 @@ Used for: crop growth stages.
   `Environment/Props/Static/*`). `public/assets/tiles/forest_tiles.png` (grass + dirt-trail autotile) is generated
   from the pack's grass and dirt colour palettes.
 
+### Mine (Step 4.2)
+- **Pixel Crawler — Free Pack (Exterior 0.1)** by **Anokolisa** (same terms as the Forest entry above; `Terms.txt`:
+  commercial use allowed, may be altered, the assets may not be resold as an asset pack).
+  Used for: `public/assets/tiles/mine_tiles.png` (128x48, 16x16 tiles: stone floor from `Tilesets/Floors_Tiles.png`,
+  rock wall top and cliff face from `Tilesets/Wall_Tiles.png`, plus darkened floor-edge tiles, a ladder tile and an exit
+  mat generated from those colours), and `public/assets/mine/node_stone.png`, `rubble.png`, `mine_rock_big.png`,
+  `crystal.png` (cropped from `Environment/Props/Static/Rocks.png`).
+  `public/assets/mine/mine_entrance.png` (32x32) was composed for this project from the same wall tiles plus pixels
+  drawn in the same palette.
+- **16x16 Cave Items** (spritesheet `Cave_Items_Spritesheet.png`, 112x80, 16x16 cells). **Author and license: NOT
+  VERIFIED** — the downloaded zip contains no license file or author name. TODO: open the original download page and
+  fill in author, URL and license here before publishing the game. Used for: item icons
+  (`public/assets/items/stone.png`, `copper_ore.png`, `gold_ore.png`, `aquamarine.png`, `ruby.png`, `emerald.png`,
+  `amethyst.png`, `pickaxe.png`) and the six ore node sprites (`public/assets/mine/node_copper|gold|aquamarine|ruby|emerald|amethyst.png`).
+  Unmodified 16x16 cells (nodes trimmed to their pixels). Not used yet: metal bars and swords on the same sheet.
+- Torches and their glow are drawn in code (no art file).
+
 ### Not used yet (kept out of the repo until needed)
 - The rest of **Sunnyside World** (village, NPCs, UI) — planned for Phase 2.
-- The rest of **Pixel Crawler** (dungeon tiles, mobs, NPCs) — candidate for the Mine.
+- The rest of **Pixel Crawler** (dungeon props, mobs, NPCs, stations such as Furnace/Anvil) — candidates for crafting and NPCs.
 - The Sunnyside `.aseprite` character file (source file, not needed at runtime).
 
 ## Code

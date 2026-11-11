@@ -113,11 +113,29 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
     Points `from_forest` (Farm) / `from_farm` (Forest). Title "Continue" resumes in the Forest if saved there.
   - The forest is empty of gameplay for now (no chopping/foraging yet) — planned next.
 
-## NEXT (Step 4.2)
-- Village house interiors, a second quest chain, real item icons (UI pack), NPC art.
-- Phase 4: Forest / Mine, mining, crafting; fish quest / recipes; beach NPC; shells to collect.
+- **Step 4.2 — Mine map + ore items**
+  - New `MineScene` (`maps/mine.json` 40x28, tileset `mine_tiles.png`): entrance room, a hub, and 4 side rooms
+    (NW gold/aquamarine, NE ruby/emerald/amethyst, SW copper, SE copper/gold). Solid cliff walls (collision from tile ids
+    1, 6, 7, 8, 9, 16), solid ore nodes and crystals (Props layer, names `node_<ore>`), rubble decoration, 11 wall torches
+    (code-drawn, flickering, soft glow) and a constant underground darkness instead of the day/night tint.
+  - Transition: new **mine entrance** in the Forest's north clearing (`to_mine`, x 266-294, y 105-122) <-> Mine exit mat
+    (`to_forest`, bottom of the entrance room). Points `from_mine` (Forest) / `from_forest` (Mine). Title "Continue"
+    resumes in the Mine if saved there. At 02:00 inside the Mine you are sent home like in the Forest.
+  - 7 new items with real icons, sold at the Shipping Bin / Seed Shop sell-all: Stone 4g, Copper Ore 18g, Gold Ore 55g,
+    Aquamarine 90g, Amethyst 100g, Emerald 120g, Ruby 140g. Pickaxe now has a real icon too.
+  - **Mining itself is NOT in yet** — nodes are solid and just look pretty (arrival text says so).
+
+## NEXT (Step 4.3)
+- Mining: select Pickaxe, face a node, Tap A -> hit animation, shake, 3 hits, drops ore/stone (+XP), node turns to
+  rubble and respawns next day. Save the mined nodes in the save file (schema v6).
+- Then: crafting (furnace: ore -> bars), forest foraging/chopping, village house interiors, second quest chain.
 
 ## KNOWN ISSUES
+- Cave Items pack (ore icons, nodes, pickaxe icon): the zip has NO license file — author/license still unverified
+  (marked TODO in CREDITS.md). Replace or confirm before publishing.
+- The mine entrance sprite is composed by hand (the free Pixel Crawler pack has no mine door); can be swapped via
+  `ASSET_MANIFEST` key `prop_mine_entrance` (32x32, origin bottom-centre).
+- Mine has one level only (no ladder down yet) and no enemies by design.
 - Item icons, UI buttons, joystick, logo and PWA icons are still code-drawn placeholders.
 - NPCs reuse the player sprite with a colour tint (the free pack has no villager sheets) — real
   NPC art can be dropped in via `ASSET_MANIFEST` + one line in `src/systems/npcs.js`.
@@ -133,3 +151,5 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 - Item, crop, place and NPC names stay English in both languages; only UI text / dialogue is translated.
 - Selling happens at the Shipping Bin next to the field until the Village shop exists.
 - Crops only grow on the dirt field tiles (the brown patch east of the shed).
+- Mine ores (Step 4.2): Stone, Copper Ore, Gold Ore, Aquamarine, Ruby, Emerald, Amethyst (no iron/coal: the pack has none).
+- Prop asset keys must be unique across Beach/Forest/Mine (`prop_<name>`): Mine rock is `mine_rock_big`.

@@ -138,5 +138,8 @@
   "fish.cancel": "Kamu menarik kail kembali.",
   "prompt.toForest": "Masuk ke hutan",
   "prompt.toFarmForest": "Kembali ke kebun",
-  "forest.arrive": "Pohon-pohon tinggi, lumut lembut, dan jamur di tanah lapang. Hutan ini sunyi... untuk sekarang."
+  "forest.arrive": "Pohon-pohon tinggi, lumut lembut, dan jamur di tanah lapang. Hutan ini sunyi... untuk sekarang.",
+  "prompt.toMine": "Masuk ke tambang",
+  "prompt.leaveMine": "Keluar dari tambang",
+  "mine.arrive": "Sejuk, gelap, dan sunyi. Obor berkedip di dinding dan bijih berkilau di dalam batu. (Menambang hadir di pembaruan berikutnya.)"
 }

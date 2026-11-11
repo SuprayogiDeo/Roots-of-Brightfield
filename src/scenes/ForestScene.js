@@ -21,7 +21,8 @@ const SOLID = {
   oak_green: [10, 6], oak_yellow: [10, 6], oak_orange: [10, 6],
   pine_a: [8, 6], pine_b: [8, 6], pine_c: [8, 6], pine_big_a: [10, 6], pine_big_b: [10, 6],
   bush_a: [20, 8], bush_b: [22, 8], bush_small: [16, 6],
-  rock_a: [20, 8], rock_b: [20, 10], rock_s: [12, 6]
+  rock_a: [20, 8], rock_b: [20, 10], rock_s: [12, 6],
+  mine_entrance: [30, 8]
 };
 
 // The Forest: north of the Farm. Winding dirt trail, dense trees and a mushroom clearing.
@@ -33,7 +34,7 @@ export default class ForestScene extends Phaser.Scene {
   preload() {
     preloadAssets(this, [
       'map_forest', 'tiles_forest', 'player', ...SFX_KEYS,
-      ...FOREST_PROPS.map((n) => `prop_${n}`)
+      ...FOREST_PROPS.map((n) => `prop_${n}`), 'prop_mine_entrance'
     ]);
   }
 
@@ -132,7 +133,9 @@ export default class ForestScene extends Phaser.Scene {
 
   pressA() {
     if (this.hud.messageOpen()) { this.hud.hideMessage(); return; }
-    if (this.zone && this.zone.action === 'to_farm') this.travel();
+    if (!this.zone) return;
+    if (this.zone.action === 'to_farm') this.travel('farm');
+    else if (this.zone.action === 'to_mine') this.travel('mine');
   }
 
   tickClock() {
@@ -143,19 +146,19 @@ export default class ForestScene extends Phaser.Scene {
     if (this.save.time.minutes >= DAY_END) {
       // too late to stay out: walk home to the farm and collapse there
       this.save.time.minutes = DAY_END - 10;
-      this.travel();
+      this.travel('farm');
     }
   }
 
-  travel() {
+  travel(to = 'farm') {
     if (this.leaving) return;
     this.leaving = true;
     playSfx(this, 'sfx_door');
-    this.save.pos = { map: 'farm', from: 'forest' };
+    this.save.pos = { map: to, from: 'forest' };
     writeSave(this.save);
     this.cameras.main.fadeOut(250, 0, 0, 0);
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-      this.scene.start('Farm');
+      this.scene.start(to === 'mine' ? 'Mine' : 'Farm');
     });
   }
 
@@ -189,8 +192,8 @@ export default class ForestScene extends Phaser.Scene {
 
     const feet = this.player.body.center;
     this.zone = this.zones.find((z) => z.rect.contains(feet.x, feet.y)) || null;
-    const label = !this.hud.messageOpen() && this.zone && this.zone.action === 'to_farm'
-      ? t('prompt.toFarmForest') : null;
+    const label = !this.hud.messageOpen() && this.zone
+      ? ({ to_farm: t('prompt.toFarmForest'), to_mine: t('prompt.toMine') }[this.zone.action] || null) : null;
     this.hud.setPrompt(label ? t('prompt.tapA', { action: label }) : null);
     this.hud.placePrompt(this.player.x, this.player.y - 18);
   }

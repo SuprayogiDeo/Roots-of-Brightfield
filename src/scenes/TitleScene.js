@@ -66,5 +66,5 @@ export default class TitleScene extends Phaser.Scene {
 function resumeScene() {
   const save = loadSave();
   const map = save && save.pos ? save.pos.map : null;
-  return map === 'village' ? 'Village' : map === 'beach' ? 'Beach' : map === 'forest' ? 'Forest' : 'Farm';
+  return map === 'village' ? 'Village' : map === 'beach' ? 'Beach' : map === 'forest' ? 'Forest' : map === 'mine' ? 'Mine' : 'Farm';
 }

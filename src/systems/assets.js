@@ -21,6 +21,11 @@ export const FOREST_PROPS = [
   'bush_a', 'bush_b', 'bush_small', 'rock_a', 'rock_b', 'rock_s',
   'flower_o', 'flower_w', 'flower_b', 'mush_a', 'mush_b', 'fern'
 ];
+export const MINE_PROPS = [
+  'node_stone', 'node_copper', 'node_gold', 'node_aquamarine', 'node_ruby', 'node_emerald', 'node_amethyst',
+  'rubble', 'mine_rock_big', 'crystal', 'mine_entrance'
+];
+export const ORE_IDS = ['stone', 'copper_ore', 'gold_ore', 'aquamarine', 'ruby', 'emerald', 'amethyst'];
 export const FISH_IDS = [
   'fish_sardine', 'fish_mackerel', 'fish_bass', 'fish_catfish', 'fish_snapper', 'fish_golden_carp'
 ];
@@ -57,6 +62,14 @@ export const ASSET_MANIFEST = {
   map_forest: { type: 'tilemap', src: 'assets/maps/forest.json' },
   tiles_forest: { type: 'image', src: 'assets/tiles/forest_tiles.png' },
   ...Object.fromEntries(FOREST_PROPS.map((n) => [`prop_${n}`, { type: 'image', src: `assets/forest/${n}.png` }])),
+
+  // Mine (Step 4.2) — floor/wall tiles + rocks: Pixel Crawler Free Pack (Anokolisa);
+  // ore icons, ore nodes and pickaxe: "16x16 Cave Items" spritesheet (see CREDITS.md).
+  map_mine: { type: 'tilemap', src: 'assets/maps/mine.json' },
+  tiles_mine: { type: 'image', src: 'assets/tiles/mine_tiles.png' },
+  ...Object.fromEntries(MINE_PROPS.map((n) => [`prop_${n}`, { type: 'image', src: `assets/mine/${n}.png` }])),
+  ...Object.fromEntries(ORE_IDS.map((n) => [`item_${n}`, { type: 'image', src: `assets/items/${n}.png` }])),
+  item_pickaxe: { type: 'image', src: 'assets/items/pickaxe.png' },
 
   // Item icons (16x16) — Sunnyside World. Key = `item_<id>`; others are still code-drawn.
   item_egg: { type: 'image', src: 'assets/items/egg.png' },

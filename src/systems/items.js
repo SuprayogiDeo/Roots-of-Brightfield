@@ -32,7 +32,16 @@ export const ITEMS = {
   fish_bass: { name: 'Sea Bass', price: 35 },
   fish_catfish: { name: 'Catfish', price: 45 },
   fish_snapper: { name: 'Red Snapper', price: 55 },
-  fish_golden_carp: { name: 'Golden Carp', price: 120 }
+  fish_golden_carp: { name: 'Golden Carp', price: 120 },
+
+  // Ores and gems (Step 4.2) — found in the Mine, sold at the Shipping Bin.
+  stone: { name: 'Stone', price: 4 },
+  copper_ore: { name: 'Copper Ore', price: 18 },
+  gold_ore: { name: 'Gold Ore', price: 55 },
+  aquamarine: { name: 'Aquamarine', price: 90 },
+  ruby: { name: 'Ruby', price: 140 },
+  emerald: { name: 'Emerald', price: 120 },
+  amethyst: { name: 'Amethyst', price: 100 }
 };
 
 export const STACK_MAX = 99;
