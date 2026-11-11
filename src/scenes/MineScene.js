@@ -1,3 +1,4 @@
+import { reportQuest, reportVisit, refreshTracker, flushQueuedQuests } from '../systems/questUi.js';
 import Phaser from 'phaser';
 import { t } from '../i18n/index.js';
 import { goTo } from '../systems/ui.js';
@@ -130,6 +131,8 @@ export default class MineScene extends Phaser.Scene {
     this.rig = new ActionRig(this, this.player);
 
     this.hud = new Hud(this, save, { onMenu: () => this.openMenu() });
+    refreshTracker(this);
+    reportVisit(this, 'mine');
     this.controls = new TouchControls(this, {
       onA: () => this.pressA(),
       onB: () => this.hud.nextRow()
@@ -254,6 +257,7 @@ export default class MineScene extends Phaser.Scene {
     if (node.body) { this.solids.remove(node.body, true, true); node.body = null; }
     node.img.setDepth(0.4);
 
+    reportQuest(this, 'mine', { item: drop });
     playSfx(this, 'sfx_pick_4');
     breakFx(this, node, node.def, 'prop_rubble');
     oreJump(this, drop, { x: node.x, y: node.y - 4 }, () => ({ x: this.player.x, y: this.player.y }), () => {

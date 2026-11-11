@@ -3,6 +3,7 @@ import { t } from '../i18n/index.js';
 import { makeText, getSafe } from './ui.js';
 import { ITEMS, createItemIcons } from './items.js';
 import { xpNeeded, MAX_LEVEL } from './xp.js';
+import { todayWeather } from './calendar.js';
 
 // In-game HUD (landscape, ~4% safe margin). Top-center stays EMPTY.
 //  top-left : date + time panel with stamina bar
@@ -46,6 +47,7 @@ export default class Hud {
     this.datePanel = fix(scene.add.rectangle(ML, M, 160, 43, 0x2b1d12, 0.72)
       .setOrigin(0).setStrokeStyle(1, 0x854f0b));
     this.dateTxt = fix(makeText(scene, ML + 6, M + 6, '', 8, '#F6E7C1', { origin: [0, 0] }), D + 1);
+    this.weatherTxt = fix(makeText(scene, ML + 154, M + 6, '', 8, '#9AD5FF', { origin: [1, 0] }), D + 1);
     this.timeTxt = fix(makeText(scene, ML + 6, M + 19, '', 8, '#EF9F27', { origin: [0, 0] }), D + 1);
     this.lvTxt = fix(makeText(scene, ML + 6, M + 32, '', 8, '#F6E7C1', { origin: [0, 0] }), D + 1);
     fix(scene.add.rectangle(ML + 50, M + 32, 100, 7, 0x1a120b).setOrigin(0).setStrokeStyle(1, 0x854f0b), D + 1);
@@ -137,7 +139,11 @@ export default class Hud {
     const { season, day, minutes } = this.save.time;
     this.dateTxt.setText(t('hud.date', { season: t(`season.${season}`), day }));
     this.timeTxt.setText(formatTime(minutes));
-    this.datePanel.setSize(Math.max(160, Math.ceil(this.dateTxt.width) + 12), 43);
+    const w = todayWeather(this.save);
+    this.weatherTxt.setText(t(`weather.${w}`));
+    const panelW = Math.max(160, Math.ceil(this.dateTxt.width + this.weatherTxt.width) + 26);
+    this.datePanel.setSize(panelW, 43);
+    this.weatherTxt.setX(this.datePanel.x + panelW - 6);
   }
 
   refreshHotbar() {

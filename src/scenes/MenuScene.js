@@ -6,7 +6,7 @@ import { loadSave, writeSave } from '../systems/save.js';
 import { ITEMS, createItemIcons, STACK_MAX } from '../systems/items.js';
 import { CROPS } from '../systems/crops.js';
 import { xpNeeded, MAX_LEVEL } from '../systems/xp.js';
-import { questObjectiveKey } from '../systems/quests.js';
+import { buildQuestLog } from './questLog.js';
 import { preloadAssets } from '../systems/assets.js';
 import { playSfx, SFX_KEYS } from '../systems/audio.js';
 
@@ -111,10 +111,7 @@ export default class MenuScene extends Phaser.Scene {
   }
 
   buildQuests() {
-    const key = questObjectiveKey(this.save.quest);
-    this.keep(makeText(this, GX, 60, key ? t('quest.label', { goal: t(key) }) : t('quests.none'), 8, '#F6E7C1', {
-      origin: [0, 0], wordWrap: { width: 370, useAdvancedWrap: true }, lineSpacing: 4
-    }));
+    buildQuestLog(this);
   }
 
   // ---------------- bag ----------------
@@ -209,10 +206,11 @@ export default class MenuScene extends Phaser.Scene {
     this.detQty.setText(`x${item.qty}`);
     const parts = [];
     if (TOOLS.includes(item.id)) parts.push(t('item.tool'));
-    if (def.seed) parts.push(t('item.seed', { days: CROPS[def.seed].days }));
+    if (def.seed) {
+      parts.push(t('item.seed', { days: CROPS[def.seed].days }));
+      parts.push(t('item.grows', { seasons: CROPS[def.seed].seasons.map((s) => t(`season.${s}`)).join(', ') }));
+    }
     if (item.id === 'animal_feed') parts.push(t('item.feed'));
-    if (def.dish) parts.push(t('item.dish'));
-    if (def.ingredient) parts.push(t('item.ingredient'));
     if (def.price) parts.push(t('item.sell', { price: def.price }));
     this.detDesc.setText(parts.join('\n'));
   }

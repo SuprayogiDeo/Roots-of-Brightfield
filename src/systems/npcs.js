@@ -22,8 +22,8 @@ export function greet(save, id) {
   const f = save.friends[id] || (save.friends[id] = { points: 0, lastDay: 0 });
   const before = heartsOf(save, id);
   let gained = false;
-  if (f.lastDay !== save.time.day) {
-    f.lastDay = save.time.day;
+  if (f.lastDay !== save.time.total) {
+    f.lastDay = save.time.total;
     f.points += 1;
     gained = true;
   }

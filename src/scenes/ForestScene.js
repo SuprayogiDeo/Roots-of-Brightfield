@@ -8,6 +8,8 @@ import Hud from '../systems/hud.js';
 import { loadSave, writeSave } from '../systems/save.js';
 import { playSfx, SFX_KEYS, createFootsteps } from '../systems/audio.js';
 import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
+import { createWeatherFx } from '../systems/weatherFx.js';
+import { reportQuest, reportVisit, refreshTracker, flushQueuedQuests } from '../systems/questUi.js';
 
 const CLOCK_STEP_MS = 7000;
 const AUTOSAVE_MS = 30000;
@@ -101,8 +103,11 @@ export default class ForestScene extends Phaser.Scene {
     applyWarmTint(this);
     createNightOverlay(this);
     updateDayNight(this, save.time.minutes);
+    createWeatherFx(this, save);
 
     this.hud = new Hud(this, save, { onMenu: () => { this.persist(); goTo(this, 'Menu', { from: 'Forest' }); } });
+    refreshTracker(this);
+    reportVisit(this, 'forest');
     this.controls = new TouchControls(this, {
       onA: () => this.pressA(),
       onB: () => this.hud.nextRow()

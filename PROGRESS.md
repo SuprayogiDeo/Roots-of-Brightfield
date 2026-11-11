@@ -250,6 +250,16 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 - Vite build warns that the bundle is >500 kB (Phaser itself) — harmless for a PWA that caches once.
 - The Old Shed has no interior yet; interacting with it after unlocking = sleep.
 
+## Step 5.1 — Seasons, weather, full quest system, Grandpa's notebook
+- Save schema v7: `time.total` (absolute day), `time.season/day` derived (4 seasons x 28 days), `weather.rainWatered`, `quests {active, done, tracked}`. Old saves migrate (v6 quest progress kept).
+- `systems/calendar.js` (pure): deterministic weather per day (first 3 days sunny; Winter = snow, no rain). Rain/storm waters all plots once per day. Off-season crops wither at season change.
+- Crop seasons: carrot Spring/Fall, corn Summer/Fall, chili Summer, tomato Spring/Summer. Planting out of season is blocked with a hint; seed detail shows "Grows in".
+- `systems/weatherFx.js`: tint, rain/snow particles, lightning, WebAudio rain ambience (Farm, Village, Beach, Forest; not Mine).
+- `systems/quests.js` (pure, data-driven): old_shed (tutorial) -> flock -> first_catch / explorer / kitchen_table / green_thumb -> rock_collector, new_season -> secret (Ayu, 500g). NPC quests: mina_eggs, rangga_fish, ayu_sambal. Quest tab: Active / Done / Notebook (9 pages) + Track button; tracker line in HUD.
+- Tests: logic tested in node (27 checks: calendar, quests, migration). NOT run in a browser.
+- Tuning: DAYS_PER_SEASON, weather weights (`calendar.js`), rewards (`quests.js`), rain volume (`weatherFx.js`).
+- KNOWN ISSUE: `CraftScene.js` is missing from the uploaded zip (Kitchen -> Craft would fail). The cook quest is queued via `questQueue.js` and applied by the next outdoor scene.
+
 ## DECISIONS
 - Item, crop, place and NPC names stay English in both languages; only UI text / dialogue is translated.
 - Selling happens at the Shipping Bin next to the field until the Village shop exists.

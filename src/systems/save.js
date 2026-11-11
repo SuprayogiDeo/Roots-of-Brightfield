@@ -1,6 +1,8 @@
 // Versioned save in localStorage. Export/Import comes in a later step.
+import { syncCalendar } from './calendar.js';
+import { newQuestState, migrateLegacyQuest, refreshQuests } from './quests.js';
 const KEY = 'roots_of_brightfield_save';
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 export const BAG_SIZE = 18;
 
 // Row 1 = tools, row 2 = starter seeds, row 3 empty.
@@ -41,6 +43,18 @@ function migrate(data) {
     data.mine = data.mine || { nodes: {} }; // node id -> in-game day it was mined out (Step 4.5)
     data.version = 6;
   }
+  if (data.version < 7) {
+    // Step 5.1: absolute day counter + 4 seasons x 28 days, weather bookkeeping, multi-quest log.
+    // Old saves counted days forever in time.day: keep that number as time.total.
+    data.time = data.time || { season: 0, day: 1, minutes: 360 };
+    data.time.total = Math.max(1, data.time.day || 1);
+    syncCalendar(data.time);
+    data.weather = data.weather || { rainWatered: 0 };
+    data.quests = migrateLegacyQuest(data.quest, data.time.total);
+    delete data.quest;
+    data.version = 7;
+    refreshQuests(data);
+  }
   if (!data.mine || typeof data.mine.nodes !== 'object' || !data.mine.nodes) data.mine = { nodes: {} };
   return data;
 }
@@ -75,17 +89,24 @@ export function deleteSave() {
   try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ }
 }
 
+function startQuests() {
+  const s = { quests: newQuestState(), time: { total: 1 }, coins: 0 };
+  refreshQuests(s); // starts "Old Shed"
+  return s.quests;
+}
+
 export function newSave({ name, gender }) {
   return {
     version: SAVE_VERSION,
     player: { name, gender },
     flags: { prologueSeen: false, shedOpen: false },
-    time: { season: 0, day: 1, minutes: 360 },
+    time: { season: 0, day: 1, total: 1, minutes: 360 },
     coins: 0,
     stamina: { cur: 100, max: 100 },
     inventory: starterInventory(),
     plots: {},
-    quest: { id: 'old_shed', step: 0, done: false },
+    weather: { rainWatered: 0 },
+    quests: startQuests(),
     friends: {},
     animals: [],
     xp: { level: 1, xp: 0 },

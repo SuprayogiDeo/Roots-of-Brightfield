@@ -41,15 +41,7 @@ export const ITEMS = {
   aquamarine: { name: 'Aquamarine', price: 90 },
   ruby: { name: 'Ruby', price: 140 },
   emerald: { name: 'Emerald', price: 120 },
-  amethyst: { name: 'Amethyst', price: 100 },
-
-  // Cooking (Step 4.2b). Salt / Coffee Beans are bought in the Kitchen pantry (no sell price on purpose,
-  // so the Shipping Bin never sells your ingredients). Dishes sell at the Shipping Bin.
-  salt: { name: 'Salt', cost: 10, ingredient: true },
-  coffee_beans: { name: 'Coffee Beans', cost: 15, ingredient: true },
-  sambal: { name: 'Sambal', price: 170, dish: true },
-  salted_egg: { name: 'Salted Egg', price: 60, dish: true },
-  coffee: { name: 'Coffee', price: 75, dish: true }
+  amethyst: { name: 'Amethyst', price: 100 }
 };
 
 export const STACK_MAX = 99;
@@ -152,27 +144,6 @@ const DRAW = {
   animal_feed(R) {
     R(4, 6, 8, 8, 0xc9a35a); R(5, 4, 6, 2, 0xb08650); R(6, 8, 4, 1, 0x8a5a33); R(6, 10, 4, 1, 0x8a5a33);
     R(5, 3, 1, 2, 0xe0c27a); R(10, 3, 1, 2, 0xe0c27a);
-  },
-  salt(R) {
-    R(4, 5, 8, 9, 0xdfe8ee); R(5, 3, 6, 2, 0x8a5a33); R(5, 6, 1, 7, 0xffffff);
-    R(6, 9, 5, 3, 0x6d9cc4); R(4, 13, 8, 1, 0x9aa0a6);
-  },
-  coffee_beans(R) {
-    R(3, 8, 5, 6, 0x5a3a22); R(8, 5, 5, 6, 0x6a4428); R(8, 11, 4, 4, 0x5a3a22);
-    R(5, 9, 1, 4, 0x2b1d12); R(10, 6, 1, 4, 0x2b1d12); R(10, 12, 1, 2, 0x2b1d12);
-  },
-  sambal(R) {
-    R(3, 8, 10, 5, 0xc49a62); R(3, 7, 10, 1, 0xe0c27a); R(5, 13, 6, 1, 0x8a5a33);
-    R(4, 5, 8, 3, 0xc4381f); R(6, 4, 3, 1, 0xe85a3a); R(9, 5, 2, 1, 0x7cae4e); R(5, 6, 1, 1, 0xf6e7c1);
-  },
-  salted_egg(R) {
-    R(5, 3, 6, 11, 0xdfe6e0); R(4, 5, 8, 7, 0xdfe6e0); R(6, 3, 3, 2, 0xeef2ee);
-    R(6, 7, 1, 1, 0x9aa0a6); R(9, 9, 1, 1, 0x9aa0a6); R(7, 11, 1, 1, 0x9aa0a6); R(10, 6, 1, 1, 0xffffff);
-  },
-  coffee(R) {
-    R(3, 7, 8, 6, 0xf6e7c1); R(11, 8, 2, 3, 0xf6e7c1); R(12, 9, 1, 1, 0x2b1d12);
-    R(4, 7, 6, 2, 0x4a2f1a); R(2, 13, 12, 1, 0xba7517);
-    R(5, 3, 1, 3, 0xd7dbe0); R(8, 2, 1, 4, 0xd7dbe0);
   },
   tomato(R) {
     R(5, 6, 7, 7, 0xd14b3d); R(6, 7, 2, 2, 0xe8766a);

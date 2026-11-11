@@ -1,11 +1,13 @@
 // Crops + soil placeholder art and growth rules.
 // Crop/item NAMES stay English in both languages (design rule).
 
+// seasons: 0 Spring, 1 Summer, 2 Fall, 3 Winter (nothing grows in Winter). A crop that is still in the
+// ground when a season it does not like begins withers (see calendar.js advanceDay).
 export const CROPS = {
-  carrot: { seed: 'carrot_seeds', produce: 'carrot', days: 3, price: 35, leaf: 0x639922, fruit: 0xef7b27 },
-  corn: { seed: 'corn_seeds', produce: 'corn', days: 4, price: 50, leaf: 0x7cae4e, fruit: 0xf2c438 },
-  chili: { seed: 'chili_seeds', produce: 'chili', days: 3, price: 40, leaf: 0x3b6d11, fruit: 0xc4553f },
-  tomato: { seed: 'tomato_seeds', produce: 'tomato', days: 4, price: 45, leaf: 0x4e7a2c, fruit: 0xd14b3d }
+  carrot: { seasons: [0, 2], seed: 'carrot_seeds', produce: 'carrot', days: 3, price: 35, leaf: 0x639922, fruit: 0xef7b27 },
+  corn: { seasons: [1, 2], seed: 'corn_seeds', produce: 'corn', days: 4, price: 50, leaf: 0x7cae4e, fruit: 0xf2c438 },
+  chili: { seasons: [1], seed: 'chili_seeds', produce: 'chili', days: 3, price: 40, leaf: 0x3b6d11, fruit: 0xc4553f },
+  tomato: { seasons: [0, 1], seed: 'tomato_seeds', produce: 'tomato', days: 4, price: 45, leaf: 0x4e7a2c, fruit: 0xd14b3d }
 };
 
 // seed id -> crop id

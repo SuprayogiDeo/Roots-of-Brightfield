@@ -9,7 +9,9 @@ import { loadSave, writeSave } from '../systems/save.js';
 import { CROPS, isReady, cropFrame, createCropTextures, createBinTexture } from '../systems/crops.js';
 import { createKitchenTexture, addKitchen } from '../systems/crafting.js';
 import { ITEMS, addItem, consumeSlot } from '../systems/items.js';
-import { advanceQuest, questObjectiveKey, QUEST_REWARD } from '../systems/quests.js';
+import { createWeatherFx } from '../systems/weatherFx.js';
+import { reportQuest, reportVisit, refreshTracker, flushQueuedQuests } from '../systems/questUi.js';
+import { advanceDay, applyRain, canGrowIn, isWet } from '../systems/calendar.js';
 import { playSfx, SFX_KEYS, createFootsteps } from '../systems/audio.js';
 import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
 import { AnimalManager, ANIMALS, newAnimal } from '../systems/animals.js';
@@ -80,6 +82,7 @@ export default class FarmScene extends Phaser.Scene {
     addKitchen(this, 400, 112); // cooking station north of the field
 
     // --- plots (tilled soil + crops) ---
+    applyRain(save); // a rainy day waters every plot (once per day)
     this.plotViews = new Map();
     Object.keys(save.plots).forEach((key) => this.drawPlot(key));
 
@@ -113,10 +116,12 @@ export default class FarmScene extends Phaser.Scene {
     applyWarmTint(this);
     createNightOverlay(this);
     updateDayNight(this, save.time.minutes);
+    createWeatherFx(this, save);
 
     // --- HUD + controls ---
     this.hud = new Hud(this, save, { onMenu: () => this.openMenu() });
-    this.refreshQuestLine();
+    refreshTracker(this);
+    flushQueuedQuests(this); // e.g. a dish cooked in the Kitchen screen
     this.controls = new TouchControls(this, {
       onA: () => this.pressA(),
       onB: () => this.hud.nextRow()
@@ -190,7 +195,11 @@ export default class FarmScene extends Phaser.Scene {
 
     if (plot && isReady(plot)) return { kind: 'harvest', key };
     if (!plot) return item && item.id === 'hoe' ? { kind: 'till', key } : null;
-    if (!plot.crop && seedCrop) return { kind: 'plant', key, crop: seedCrop };
+    if (!plot.crop && seedCrop) {
+      return canGrowIn(CROPS[seedCrop], this.save.time.season)
+        ? { kind: 'plant', key, crop: seedCrop }
+        : { kind: 'offseason', key, crop: seedCrop };
+    }
     if (plot.crop && !plot.watered && item && item.id === 'watering_can') return { kind: 'water', key };
     return null;
   }
@@ -211,6 +220,7 @@ export default class FarmScene extends Phaser.Scene {
       plots[act.key].watered = true;
     } else if (act.kind === 'harvest') {
       const plot = plots[act.key];
+      act.cropId = plot.crop;
       const crop = CROPS[plot.crop];
       const left = addItem(inv, crop.produce, 1);
       if (left > 0) { this.hud.toast(t('msg.bagFull'), '#C4553F'); playSfx(this, 'sfx_deny'); return false; }
@@ -226,7 +236,7 @@ export default class FarmScene extends Phaser.Scene {
     if (plots[act.key]) this.drawPlot(act.key);
     if (!this.rig.ready) this.pulse(0xf6e7c1); // placeholder art only; real art has the pose + effects
     this.gainXp(act.kind);
-    this.checkQuest(act.kind);
+    this.checkQuest(act.kind, { crop: act.cropId || act.crop });
     this.persist();
     return true;
   }
@@ -319,6 +329,7 @@ export default class FarmScene extends Phaser.Scene {
     this.hud.refresh();
     if (!this.rig.ready) this.pulse(0xf6e7c1);
     this.gainXp(act.kind);
+    this.checkQuest(act.kind, { item: def.product });
     this.persist();
     return true;
   }
@@ -344,8 +355,18 @@ export default class FarmScene extends Phaser.Scene {
     if (animalAct) { this.startAnimalAction(animalAct); return; }
     const { tx, ty } = this.tileUnderPlayer();
     const act = this.farmActionAt(tx, ty);
-    if (act) this.startFarmAction(act);
+    if (act && act.kind === 'offseason') this.offSeasonHint(act);
+    else if (act) this.startFarmAction(act);
     else this.pulse(0xef9f27, '!');
+  }
+
+  // Seed does not grow in this season: explain which seasons it likes.
+  offSeasonHint(act) {
+    const crop = CROPS[act.crop];
+    const seasons = crop.seasons.map((s) => t(`season.${s}`)).join(', ');
+    playSfx(this, 'sfx_deny');
+    this.hud.toast(t('msg.offseason', { season: t(`season.${this.save.time.season}`) }), '#C4553F');
+    this.hud.showMessage(t('msg.offseasonInfo', { crop: ITEMS[crop.produce].name, seasons }));
   }
 
   interact(action) {
@@ -397,7 +418,7 @@ export default class FarmScene extends Phaser.Scene {
     this.hud.refresh();
     this.hud.toast(`+${coins}g`, '#EF9F27');
     this.hud.showMessage(t('bin.sold', { count, coins }));
-    this.checkQuest('sell');
+    this.checkQuest('sell', { count });
     this.persist();
   }
 
@@ -423,44 +444,36 @@ export default class FarmScene extends Phaser.Scene {
     });
   }
 
-  // Grow every watered crop, reset the clock and refill stamina.
+  // Grow every watered crop, move the calendar, let rain water the plots, report the new day.
   newDay(passedOut) {
     const save = this.save;
-    save.time.day += 1;
-    save.time.minutes = 360; // 06:00 AM
     Object.keys(save.plots).forEach((key) => {
       const plot = save.plots[key];
       if (plot.crop && plot.watered) plot.grown = Math.min(plot.grown + 1, CROPS[plot.crop].days);
       plot.watered = false;
-      this.drawPlot(key);
     });
+    const day = advanceDay(save, CROPS); // total+1, season / day, 06:00, withers off-season crops
+    applyRain(save);                      // rain or storm: every plot is watered again
+    Object.keys(save.plots).forEach((key) => this.drawPlot(key));
     this.animals.newDay();
     this.hud.refresh();
     playSfx(this, 'jingle_day');
-    this.hud.showMessage(passedOut ? t('day.passedOut') : t('day.new', { day: save.time.day }));
+
+    const lines = [passedOut ? t('day.passedOut') : t('day.new', { day: save.time.day })];
+    if (day.seasonChanged) lines.push(t('season.new', { season: t(`season.${save.time.season}`) }));
+    if (day.withered.length) lines.push(t('season.wither', { n: day.withered.length }));
+    if (isWet(day.weather)) lines.push(t('weather.rainWater'));
+    lines.push(t('weather.forecast', { weather: t(`weather.${day.forecast}`) }));
+    if (save.time.day === 28) lines.push(t('season.last'));
+    this.hud.showMessage(lines.join('\n'));
+    if (day.seasonChanged) this.time.delayedCall(5400, () => this.checkQuest('season', { season: save.time.season }));
     this.persist();
   }
 
   // ---------------- quest ----------------
-  checkQuest(action) {
-    const finished = advanceQuest(this.save, action);
-    this.refreshQuestLine();
+  checkQuest(type, payload) {
+    reportQuest(this, type, payload);
     this.hud.refresh();
-    if (finished) {
-      playSfx(this, 'jingle_quest');
-      const hen = newAnimal('chicken');
-      this.save.animals.push(hen);
-      this.animals.spawn(hen);
-      addItem(this.save.inventory, 'animal_feed', 3);
-      this.hud.refreshHotbar();
-      this.hud.showMessage(t('quest.shed.complete', { coins: QUEST_REWARD }));
-      this.hud.toast(`+${QUEST_REWARD}g`, '#EF9F27');
-    }
-  }
-
-  refreshQuestLine() {
-    const key = questObjectiveKey(this.save.quest);
-    this.hud.setQuest(key ? t('quest.label', { goal: t(key) }) : null);
   }
 
   // ---------------- prompts / misc ----------------

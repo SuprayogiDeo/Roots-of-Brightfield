@@ -7,7 +7,7 @@ export function xpNeeded(level) {
 }
 
 // XP rewards per action.
-export const XP_GAIN = { till: 1, plant: 1, water: 1, harvest: 4, feed: 2, collect: 3, cook: 4, fish: 3 };
+export const XP_GAIN = { till: 1, plant: 1, water: 1, harvest: 4, feed: 2, collect: 3, fish: 3 };
 
 // Adds XP to the save. Returns { leveled, level }.
 export function addXp(save, amount) {

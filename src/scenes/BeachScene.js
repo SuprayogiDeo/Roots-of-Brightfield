@@ -8,6 +8,8 @@ import Hud from '../systems/hud.js';
 import { loadSave, writeSave } from '../systems/save.js';
 import { playSfx, SFX_KEYS, createFootsteps } from '../systems/audio.js';
 import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
+import { createWeatherFx } from '../systems/weatherFx.js';
+import { reportQuest, reportVisit, refreshTracker, flushQueuedQuests } from '../systems/questUi.js';
 import { ITEMS, addItem } from '../systems/items.js';
 import { addXp, XP_GAIN } from '../systems/xp.js';
 import FishingGame, { fishName } from '../systems/fishing.js';
@@ -107,9 +109,12 @@ export default class BeachScene extends Phaser.Scene {
     applyWarmTint(this);
     createNightOverlay(this);
     updateDayNight(this, save.time.minutes);
+    createWeatherFx(this, save);
 
     // --- HUD + controls ---
     this.hud = new Hud(this, save, { onMenu: () => { this.persist(); goTo(this, 'Menu', { from: 'Beach' }); } });
+    refreshTracker(this);
+    reportVisit(this, 'beach');
     this.fishing = new FishingGame(this, {
       getLevel: () => this.save.xp.level,
       player: this.player,
@@ -183,6 +188,7 @@ export default class BeachScene extends Phaser.Scene {
         this.hud.toast(t('level.up', { level: r.level }), '#EF9F27');
       });
     }
+    reportQuest(this, 'fish', { id });
     this.persist();
     return true;
   }

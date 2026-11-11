@@ -10,6 +10,9 @@ import { playSfx, SFX_KEYS, createFootsteps } from '../systems/audio.js';
 import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
 import Dialogue from '../systems/dialogue.js';
 import { NPCS, greet, lineFor } from '../systems/npcs.js';
+import { createWeatherFx } from '../systems/weatherFx.js';
+import { announceQuest, refreshTracker, flushQueuedQuests } from '../systems/questUi.js';
+import { questEvent, offerFor, activeFor, canDeliver, deliver, startQuest } from '../systems/quests.js';
 
 const CLOCK_STEP_MS = 7000;
 const AUTOSAVE_MS = 30000;
@@ -89,9 +92,13 @@ export default class VillageScene extends Phaser.Scene {
     applyWarmTint(this);
     createNightOverlay(this);
     updateDayNight(this, save.time.minutes);
+    createWeatherFx(this, save);
 
     this.hud = new Hud(this, save, { onMenu: () => { this.persist(); goTo(this, 'Menu', { from: 'Village' }); } });
     this.dialogue = new Dialogue(this);
+    this.pendingQuest = []; // quest results shown once the dialogue box closes
+    refreshTracker(this);
+    flushQueuedQuests(this);
     this.controls = new TouchControls(this, {
       onA: () => this.pressA(),
       onB: () => this.hud.nextRow()
@@ -140,19 +147,49 @@ export default class VillageScene extends Phaser.Scene {
   talk(id) {
     const def = NPCS[id];
     if (!def) return;
-    const res = greet(this.save, id);
+    const save = this.save;
+    const res = greet(save, id);
     playSfx(this, 'sfx_click');
-    const choices = def.role === 'shop'
+    const lines = [t(lineFor(save, id)), ...(res.gained ? [t('friend.gained', { name: def.name })] : [])];
+    let choices = def.role === 'shop'
       ? [{ label: t('shop.open'), value: 'shop' }, { label: t('common.bye'), value: 'bye' }]
       : null;
+
+    // --- villager requests: hand in / offer / reminder ---
+    const active = activeFor(save, id);
+    const offer = active ? null : offerFor(save, id);
+    if (active && canDeliver(save, active)) {
+      lines.push(t(`quest.${active}.thanks`));
+      choices = [{ label: t('quest.thanksBtn'), value: 'turnin' }];
+    } else if (active) {
+      lines.push(t(`quest.${active}.remind`));
+    } else if (offer) {
+      lines.push(t(`quest.${offer}.offer`));
+      choices = def.role === 'shop'
+        ? [{ label: t('quest.accept'), value: 'accept' }, { label: t('shop.open'), value: 'shop' }, { label: t('quest.later'), value: 'bye' }]
+        : [{ label: t('quest.accept'), value: 'accept' }, { label: t('quest.later'), value: 'bye' }];
+    }
+
+    // "talk to <npc>" objectives (e.g. the last notebook page)
+    this.pendingQuest.push(questEvent(save, 'talk', { npc: id }));
+
     this.hud.setHotbarVisible(false);
     this.dialogue.show({
       name: def.name,
       hearts: res.hearts,
       tint: def.tint,
-      lines: [t(lineFor(this.save, id)), ...(res.gained ? [t('friend.gained', { name: def.name })] : [])],
+      lines,
       choices,
-      onChoice: (v) => { if (v === 'shop') this.openShop(); }
+      onChoice: (v) => {
+        if (v === 'shop') this.openShop();
+        else if (v === 'accept' && offer) {
+          startQuest(save, offer);
+          this.pendingQuest.push({ progressed: [], completed: [], started: [offer] });
+        } else if (v === 'turnin' && active) {
+          this.pendingQuest.push(deliver(save, active));
+        }
+        this.persist();
+      }
     });
     this.persist();
   }
@@ -193,6 +230,9 @@ export default class VillageScene extends Phaser.Scene {
   update(time, delta) {
     if (!this.player) return;
     const busy = this.dialogue.isOpen() || this.hud.messageOpen();
+    if (!this.dialogue.isOpen() && this.pendingQuest.length) {
+      this.pendingQuest.splice(0).forEach((r) => announceQuest(this, r));
+    }
     if (!this.dialogue.isOpen() && this.hotbarHidden) { this.hotbarHidden = false; this.hud.setHotbarVisible(true); }
     if (this.dialogue.isOpen()) this.hotbarHidden = true;
     const move = busy ? new Phaser.Math.Vector2(0, 0) : this.controls.getMove();

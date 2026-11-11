@@ -41,14 +41,14 @@ export function isMinedOut(save, id) {
 }
 
 export function markMinedOut(save, id) {
-  save.mine.nodes[id] = save.time.day;
+  save.mine.nodes[id] = save.time.total;
 }
 
 // Nodes mined on an earlier day come back. Returns how many respawned.
 export function respawnNodes(save) {
   let n = 0;
   Object.keys(save.mine.nodes).forEach((id) => {
-    if (save.time.day > save.mine.nodes[id]) { delete save.mine.nodes[id]; n++; }
+    if (save.time.total > save.mine.nodes[id]) { delete save.mine.nodes[id]; n++; }
   });
   return n;
 }

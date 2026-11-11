@@ -1,4 +1,5 @@
 import { addItem, countItem } from './items.js';
+import { queueQuestEvent } from './questQueue.js';
 
 // Cooking recipes (Nusantara flavour). Item names stay English in both languages.
 // needs = { itemId: amount }. Salt and Coffee Beans are bought in the Kitchen pantry.
@@ -36,6 +37,7 @@ export function craft(inv, recipe) {
   if (addItem(trial, recipe.out, recipe.qty || 1) > 0) return 'full';
   Object.entries(recipe.needs).forEach(([id, n]) => removeItems(inv, id, n));
   addItem(inv, recipe.out, recipe.qty || 1);
+  queueQuestEvent('cook', { recipe: recipe.id }); // picked up by the next outdoor scene
   return 'ok';
 }
 
