@@ -135,5 +135,8 @@
   "fish.away": "Too slow... it got away.",
   "fish.lost": "The fish slipped off the hook!",
   "fish.caught": "Caught {name}!",
-  "fish.cancel": "You reel the line back in."
+  "fish.cancel": "You reel the line back in.",
+  "prompt.toForest": "Enter the forest",
+  "prompt.toFarmForest": "Go back to the farm",
+  "forest.arrive": "Tall trees, soft moss and mushrooms in the clearing. The forest is quiet... for now."
 }

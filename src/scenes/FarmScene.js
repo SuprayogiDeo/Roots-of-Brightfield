@@ -306,6 +306,8 @@ export default class FarmScene extends Phaser.Scene {
       this.travel('village');
     } else if (action === 'to_beach') {
       this.travel('beach');
+    } else if (action === 'to_forest') {
+      this.travel('forest');
     } else if (action === 'bin') {
       this.sellHarvest();
     }
@@ -403,6 +405,7 @@ export default class FarmScene extends Phaser.Scene {
     if (action === 'bin') return t('prompt.sell');
     if (action === 'to_village') return t('prompt.toVillage');
     if (action === 'to_beach') return t('prompt.toBeach');
+    if (action === 'to_forest') return t('prompt.toForest');
     return null;
   }
 
@@ -414,7 +417,7 @@ export default class FarmScene extends Phaser.Scene {
     writeSave(this.save);
     this.cameras.main.fadeOut(250, 0, 0, 0);
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-      this.scene.start(to === 'beach' ? 'Beach' : 'Village');
+      this.scene.start({ beach: 'Beach', forest: 'Forest' }[to] || 'Village');
     });
   }
 

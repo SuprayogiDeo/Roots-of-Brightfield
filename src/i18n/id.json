@@ -135,5 +135,8 @@
   "fish.away": "Terlalu lambat... ikannya kabur.",
   "fish.lost": "Ikannya lepas dari kail!",
   "fish.caught": "Dapat {name}!",
-  "fish.cancel": "Kamu menarik kail kembali."
+  "fish.cancel": "Kamu menarik kail kembali.",
+  "prompt.toForest": "Masuk ke hutan",
+  "prompt.toFarmForest": "Kembali ke kebun",
+  "forest.arrive": "Pohon-pohon tinggi, lumut lembut, dan jamur di tanah lapang. Hutan ini sunyi... untuk sekarang."
 }

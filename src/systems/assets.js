@@ -16,6 +16,11 @@ export const BEACH_PROPS = [
   'palm_a', 'palm_b', 'palm_big', 'palm_pair', 'rock_big', 'rock_tall', 'rock_s1', 'rock_s2',
   'shell_star', 'shell_blue', 'shell_pink', 'pebble', 'coconut', 'boat', 'barrel1', 'barrel2'
 ];
+export const FOREST_PROPS = [
+  'oak_green', 'oak_yellow', 'oak_orange', 'pine_a', 'pine_b', 'pine_c', 'pine_big_a', 'pine_big_b',
+  'bush_a', 'bush_b', 'bush_small', 'rock_a', 'rock_b', 'rock_s',
+  'flower_o', 'flower_w', 'flower_b', 'mush_a', 'mush_b', 'fern'
+];
 export const FISH_IDS = [
   'fish_sardine', 'fish_mackerel', 'fish_bass', 'fish_catfish', 'fish_snapper', 'fish_golden_carp'
 ];
@@ -47,6 +52,11 @@ export const ASSET_MANIFEST = {
   ...Object.fromEntries(BEACH_PROPS.map((n) => [`prop_${n}`, { type: 'image', src: `assets/beach/${n}.png` }])),
   ...Object.fromEntries(FISH_IDS.map((n) => [`item_${n}`, { type: 'image', src: `assets/items/${n}.png` }])),
   item_fishing_rod: { type: 'image', src: 'assets/items/fishing_rod.png' },
+
+  // Forest (Step 4.1b) — Pixel Crawler Free Pack (Anokolisa): trees, bushes, rocks, flowers, mushrooms.
+  map_forest: { type: 'tilemap', src: 'assets/maps/forest.json' },
+  tiles_forest: { type: 'image', src: 'assets/tiles/forest_tiles.png' },
+  ...Object.fromEntries(FOREST_PROPS.map((n) => [`prop_${n}`, { type: 'image', src: `assets/forest/${n}.png` }])),
 
   // Item icons (16x16) — Sunnyside World. Key = `item_<id>`; others are still code-drawn.
   item_egg: { type: 'image', src: 'assets/items/egg.png' },
