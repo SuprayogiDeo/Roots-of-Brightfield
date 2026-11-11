@@ -1,6 +1,6 @@
 // Versioned save in localStorage. Export/Import comes in a later step.
 const KEY = 'roots_of_brightfield_save';
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 export const BAG_SIZE = 18;
 
 // Row 1 = tools, row 2 = starter seeds, row 3 empty.
@@ -37,6 +37,11 @@ function migrate(data) {
     data.xp = data.xp || { level: 1, xp: 0 };
     data.version = 5;
   }
+  if (data.version < 6) {
+    data.mine = data.mine || { nodes: {} }; // node id -> in-game day it was mined out (Step 4.5)
+    data.version = 6;
+  }
+  if (!data.mine || typeof data.mine.nodes !== 'object' || !data.mine.nodes) data.mine = { nodes: {} };
   return data;
 }
 
@@ -84,6 +89,7 @@ export function newSave({ name, gender }) {
     friends: {},
     animals: [],
     xp: { level: 1, xp: 0 },
+    mine: { nodes: {} },
     pos: null // { map, x, y } — null = map spawn point
   };
 }

@@ -123,7 +123,7 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
     resumes in the Mine if saved there. At 02:00 inside the Mine you are sent home like in the Forest.
   - 7 new items with real icons, sold at the Shipping Bin / Seed Shop sell-all: Stone 4g, Copper Ore 18g, Gold Ore 55g,
     Aquamarine 90g, Amethyst 100g, Emerald 120g, Ruby 140g. Pickaxe now has a real icon too.
-  - **Mining itself is NOT in yet** — nodes are solid and just look pretty (arrival text says so).
+  - Mining itself arrived in Step 4.5.
 
 - **Step 4.2b — mine door cleared**
   - Removed the big rock (`rock_b` at x 280, y 128) that stood in front of the Forest's mine door. Checked that no
@@ -175,10 +175,38 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
     with the same math). **Tune on the phone** if needed: `HAND` / `AIM` in `fishingPose.js`, `CAST_*` / `WINDUP_DEG` in
     `fishing.js`.
 
+- **Step 4.5 — Mining** (2 parts, both in)
+  - **Part 1 — logic + drops + save** (`src/systems/mining.js`, new; wired in `MineScene.js`): select the **Pickaxe**
+    on the hotbar, face an ore node, **Tap A** (prompt "Tap A: Mine" shows when a node is in front; without the
+    pickaxe selected a hint toast appears). **3 hits** break a node (hit counter lives in memory per visit — leaving the
+    Mine resets half-mined nodes). Drop = 1 item by node type: `node_stone` -> Stone, `node_copper` -> Copper Ore,
+    `node_gold` -> Gold Ore, `node_aquamarine` / `node_amethyst` / `node_emerald` / `node_ruby` -> the same gem.
+    XP on break (`NODE_DEFS` in `mining.js`): Stone 2, Copper 3, Gold 5, Aquamarine 7, Amethyst 7, Emerald 8, Ruby 9.
+    Level-up toast + jingle like the Farm.
+  - **Bag full:** checked **before the swing** (`canFit`): toast "Bag is full!" + deny blip, no swing, node stays whole.
+  - **Respawn + save:** mined-out node = rubble sprite, no collision (walkable). **Save schema v6** adds
+    `mine: { nodes: { "<tiled object id>": <day mined out> } }`; v1-v5 saves migrate to `mine: { nodes: {} }`.
+    When the Mine opens, every node with `save.time.day > minedDay` is removed from the list = back **the next day**.
+    Node ids are the Tiled object ids in `maps/mine.json` — do not re-export the map with new ids (all 22 ids are unique).
+  - Target = a thin probe box in front of the feet (`findTarget`): a node beside the player is not hit when facing along it.
+  - **Part 2 — animation + effects + sound** (`miningFx.js`, new; `toolAnim.js` unchanged): `rig.playTool('pickaxe', ...)`
+    swing (movement / Tap A / menu locked meanwhile); the hit is committed on the **strike frame**. Hits 1-2: node
+    rattles + white flash, rock chips in the node's colour, a sparkle. Hit 3: bigger burst + dust puffs + sparkles +
+    tiny camera shake, node pops into rubble (scale 1.5 -> 1). The drop **hops out, lands beside the node, then flies into
+    the player** (follows them if they move) and floating **"+1"** appears; hotbar refreshes + click blip on arrival.
+    Without real player art the swing falls back to instant (logic still works).
+  - **Sound:** the uploaded `herrparadox-mining_pickaxe_hit_crystal_rock_sharp-514333.mp3` held 4 separate hits, cut into
+    `public/assets/sfx/sfx_pick_1..4.(ogg|mp3)`; hits 1-2 play a random one of 1-3 (never the same twice in a row), the
+    breaking hit plays 4. Keys `sfx_pick_1..4` in `audio.js` / `assets.js`. Credits added (source/license TODO).
+  - Texts: `prompt.mine`, `mine.needPickaxe`; `mine.arrive` no longer says "mining arrives later" (EN + ID).
+  - Checked: `vite build` OK; logic test (save migration v3/v5 -> v6, bag full, respawn same day / next day, target
+    probe in all 4 directions, all 22 nodes have a def) passes. **Not run in a real browser** — tune on the phone:
+    `windup` / `hold` of `pickaxe` in `toolAnim.js` `TOOLS`, `findTarget` probe size in `mining.js`, effect sizes in `miningFx.js`.
+
 ## NEXT
-- **Step 4.5** — Mining: select Pickaxe, face a node, Tap A -> swing animation (`rig.playTool('pickaxe')`), shake, 3 hits, drops ore/stone (+XP),
-  node turns to rubble and respawns next day; mined nodes saved (new save schema version).
-- Then: crafting (furnace: ore -> bars), forest foraging/chopping, village house interiors, second quest chain.
+- Crafting (furnace: ore -> bars), forest foraging/chopping (use `rig.playTool('axe', ...)`), village house interiors,
+  second quest chain.
+- Mining ideas not done: tool upgrades (more damage = fewer hits), rare double drops, mine level 2 (ladder), energy-free by design.
 
 ## KNOWN ISSUES
 - Cave Items pack (ore icons, nodes, pickaxe icon): the zip has NO license file — author/license still unverified
@@ -186,6 +214,8 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 - The mine entrance sprite is composed by hand (the free Pixel Crawler pack has no mine door); can be swapped via
   `ASSET_MANIFEST` key `prop_mine_entrance` (32x32, origin bottom-centre).
 - Mine has one level only (no ladder down yet) and no enemies by design.
+- Pickaxe sound `sfx_pick_*`: source page / license of the herrparadox clip is unverified (TODO in CREDITS.md).
+- Half-mined nodes (1-2 hits) are not saved: leaving the Mine resets their hit count (only mined-out nodes persist).
 - Item icons, UI buttons, joystick, logo and PWA icons are still code-drawn placeholders.
 - NPCs reuse the player sprite with a colour tint (the free pack has no villager sheets) — real
   NPC art can be dropped in via `ASSET_MANIFEST` + one line in `src/systems/npcs.js`.

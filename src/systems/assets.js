@@ -87,6 +87,12 @@ export const ASSET_MANIFEST = {
   sfx_splash: { type: 'audio', src: ['assets/sfx/sfx_splash.ogg', 'assets/sfx/sfx_splash.mp3'] },
   // Looping wet footsteps while walking — spinopel "water-splash-290839" (seamless loop).
   sfx_steps_wet: { type: 'audio', src: ['assets/sfx/sfx_steps_wet.ogg', 'assets/sfx/sfx_steps_wet.mp3'] },
+  // Pickaxe hits (Step 4.5) — herrparadox "mining pickaxe hit crystal rock sharp" (see CREDITS.md),
+  // cut into 4 single hits, ogg + mp3 fallback. 1-3 = normal hits, 4 = the breaking hit.
+  sfx_pick_1: { type: 'audio', src: ['assets/sfx/sfx_pick_1.ogg', 'assets/sfx/sfx_pick_1.mp3'] },
+  sfx_pick_2: { type: 'audio', src: ['assets/sfx/sfx_pick_2.ogg', 'assets/sfx/sfx_pick_2.mp3'] },
+  sfx_pick_3: { type: 'audio', src: ['assets/sfx/sfx_pick_3.ogg', 'assets/sfx/sfx_pick_3.mp3'] },
+  sfx_pick_4: { type: 'audio', src: ['assets/sfx/sfx_pick_4.ogg', 'assets/sfx/sfx_pick_4.mp3'] },
   sfx_harvest: { type: 'audio', src: 'assets/sfx/sfx_harvest.ogg' },
   sfx_coins: { type: 'audio', src: 'assets/sfx/sfx_coins.ogg' },
   sfx_door: { type: 'audio', src: 'assets/sfx/sfx_door.ogg' },

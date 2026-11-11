@@ -53,6 +53,11 @@ Used for: crop growth stages.
   the clip is trimmed into a seamless loop (tail crossfaded into the head).
 - Check each file's license on its original page before publishing the game commercially.
 
+### Mining sound (Step 4.5)
+- `sfx_pick_1..4` (pickaxe hitting rock, Mine) — herrparadox, "mining pickaxe hit crystal rock sharp" (file id 514333;
+  file name format suggests Pixabay — TODO: confirm the source page and license). The original 4.65 s clip holds four
+  separate hits; it was cut into four 0.65 s clips (fade-out + loudness normalised), saved as ogg + mp3.
+
 ### Beach + Fishing (Step 4.1)
 - **Time Fantasy — Beach Tileset** by **finalbossblues** (timefantasy.net; free release, credit the artist).
   Used for: sand/water/palm/rock/shell/pier pixels. `public/assets/tiles/beach_tiles.png` is a 16x16 sheet

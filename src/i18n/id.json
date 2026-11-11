@@ -141,5 +141,7 @@
   "forest.arrive": "Pohon-pohon tinggi, lumut lembut, dan jamur di tanah lapang. Hutan ini sunyi... untuk sekarang.",
   "prompt.toMine": "Masuk ke tambang",
   "prompt.leaveMine": "Keluar dari tambang",
-  "mine.arrive": "Sejuk, gelap, dan sunyi. Obor berkedip di dinding dan bijih berkilau di dalam batu. (Menambang hadir di pembaruan berikutnya.)"
+  "mine.arrive": "Sejuk, gelap, dan sunyi. Obor berkedip di dinding dan bijih berkilau di dalam batu. Pilih Pickaxe lalu tekan A di dekat batu untuk menambang.",
+  "prompt.mine": "Tambang",
+  "mine.needPickaxe": "Pilih Pickaxe di hotbar untuk menambang."
 }

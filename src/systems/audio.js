@@ -7,7 +7,8 @@ const LS_KEY = 'rob_sfx';
 export const SFX_KEYS = [
   'sfx_click', 'sfx_till', 'sfx_plant', 'sfx_water', 'sfx_harvest',
   'sfx_coins', 'sfx_door', 'sfx_deny', 'jingle_quest', 'jingle_day',
-  'sfx_splash', 'sfx_steps_wet'
+  'sfx_splash', 'sfx_steps_wet',
+  'sfx_pick_1', 'sfx_pick_2', 'sfx_pick_3', 'sfx_pick_4'
 ];
 
 const VOLUME = {
@@ -21,6 +22,10 @@ const VOLUME = {
   sfx_coins: 0.5,
   sfx_door: 0.5,
   sfx_deny: 0.35,
+  sfx_pick_1: 0.6,
+  sfx_pick_2: 0.6,
+  sfx_pick_3: 0.6,
+  sfx_pick_4: 0.7,
   jingle_quest: 0.3,
   jingle_day: 0.25
 };
