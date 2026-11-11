@@ -14,7 +14,7 @@
 
 export const BEACH_PROPS = [
   'palm_a', 'palm_b', 'palm_big', 'palm_pair', 'rock_big', 'rock_tall', 'rock_s1', 'rock_s2',
-  'shell_star', 'shell_blue', 'shell_pink', 'pebble', 'coconut', 'hut', 'boat', 'barrel1', 'barrel2'
+  'shell_star', 'shell_blue', 'shell_pink', 'pebble', 'coconut', 'boat', 'barrel1', 'barrel2'
 ];
 export const FISH_IDS = [
   'fish_sardine', 'fish_mackerel', 'fish_bass', 'fish_catfish', 'fish_snapper', 'fish_golden_carp'

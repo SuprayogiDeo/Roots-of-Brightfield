@@ -58,7 +58,7 @@ Used for: crop growth stages.
   generated from its colours. `public/assets/beach/*.png` (palms, rocks, shells, coconut) are crops of it.
 - **Free Fishing Game Assets — Pixel Art Pack** (CraftPix.net, free pack; do not redistribute the files as a pack).
   Used for: fish icons and rod icon (`public/assets/items/fish_*.png`, `fishing_rod.png`, downscaled 32->16 from
-  `4 Icons`), the fishing hut, boat and barrels (`public/assets/beach/hut.png`, `boat.png`, `barrel1/2.png`).
+  `4 Icons`), the boat and barrels (`public/assets/beach/boat.png`, `barrel1/2.png`).
 - Not used (yet): `Beach.zip` (sand-castle sprite sheets), the Fisherman character animations.
 
 ### Not used yet (kept out of the repo until needed)

@@ -23,7 +23,7 @@ const propOf = (obj, name) => ((obj.properties || []).find((p) => p.name === nam
 const SOLID = {
   palm_a: [8, 6], palm_b: [8, 6], palm_big: [10, 8], palm_pair: [44, 8],
   rock_big: [24, 10], rock_tall: [10, 8], rock_s1: [8, 6], rock_s2: [10, 6],
-  boat: [60, 8], barrel1: [14, 6], barrel2: [14, 6], hut: [160, 120]
+  boat: [60, 8], barrel1: [14, 6], barrel2: [14, 6]
 };
 
 const FACING = { down: [0, 1], up: [0, -1], left: [-1, 0], right: [1, 0] };
@@ -72,7 +72,7 @@ export default class BeachScene extends Phaser.Scene {
     if (p && p.map === 'beach' && typeof p.x === 'number') start = p;
     else if (p && p.from) start = point(`from_${p.from}`) || start;
 
-    // --- props (palms, rocks, shells, boat, hut...) ---
+    // --- props (palms, rocks, shells, boat, barrels...) ---
     this.solids = this.physics.add.staticGroup();
     map.getObjectLayer('Props').objects.forEach((o) => {
       const key = `prop_${o.name}`;

@@ -94,7 +94,7 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 ## PHASE 4
 - **Step 4.1 — Beach + fishing**
   - New `BeachScene` (`public/assets/maps/beach.json`, tileset `beach_tiles.png`): grass -> sand -> sea, a pier
-    (walkable, 2 tiles wide) with water on both sides, palms/rocks/shells/boat/fishing hut as map-driven **props**
+    (walkable, 2 tiles wide) with water on both sides, palms/rocks/shells/boat/barrels as map-driven **props**
     (object layer `Props`; solid footprints are listed in `BeachScene.js` `SOLID`).
   - Transition: Farm south edge (`to_beach` zone, x 256-384, y 370) <-> Beach north edge (`to_farm`). Arrival points
     `from_beach` (Farm) / `from_farm` (Beach). Title "Continue" resumes on the Beach if saved there.
