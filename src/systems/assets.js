@@ -76,6 +76,11 @@ export const ASSET_MANIFEST = {
   // Item icons (16x16) — Sunnyside World. Key = `item_<id>`; others are still code-drawn.
   item_egg: { type: 'image', src: 'assets/items/egg.png' },
   item_milk: { type: 'image', src: 'assets/items/milk.png' },
+  // Cooking (Step 4.6b): Sambal = Pixel Art Food Icons FREE (soup_1), Coffee = Pixel Art Food Pack (Cup of coffee)
+  item_sambal: { type: 'image', src: 'assets/items/sambal.png' },
+  item_coffee: { type: 'image', src: 'assets/items/coffee.png' },
+  // Kitchen station = Cooking & Kitchen Icons Pack (CC0) stove.png, 32x32
+  kitchen: { type: 'image', src: 'assets/kitchen/stove.png' },
 
   // Sound — Kenney (CC0)
   sfx_click: { type: 'audio', src: 'assets/sfx/sfx_click.ogg' },

@@ -218,6 +218,10 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
     dish / ingredient hints. New i18n keys (EN + ID): `prompt.cook`, `kitchen.*`, `item.dish`, `item.ingredient`.
   - No save-schema change (still v6). Checked: `vite build` OK + headless-browser test (prompt, open Craft, buy, cook all 3,
     missing-ingredients message, coins/XP correct, Mine scene still loads). Not run on a real phone.
+  - **Real art (Step 4.6b):** Kitchen sprite = `public/assets/kitchen/stove.png` (Cooking & Kitchen Icons Pack, CC0); icons
+    `items/sambal.png` (Pixel Art Food Icons FREE, soup_1) and `items/coffee.png` (Pixel Art Food Pack, Cup of coffee),
+    downscaled to 16x16. Still placeholders: Salted Egg, Salt, Coffee Beans icons. Unused packs kept out of the repo:
+    Bitglow pixelinterior (house interiors, license forbids standalone redistribution), Food Pack 2, BigWander Banquet.
   - Step 4.2 (Mine map + mining) was already in this build (Step 4.5 above) — nothing to redo.
 
 ## NEXT
@@ -226,7 +230,8 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 - Mining ideas not done: tool upgrades (more damage = fewer hits), rare double drops, mine level 2 (ladder), energy-free by design.
 
 ## KNOWN ISSUES
-- Kitchen sprite and the 5 new food/ingredient icons are code-drawn placeholders (no cooking art in the packs yet).
+- Salted Egg, Salt and Coffee Beans icons are still code-drawn placeholders (no matching art found yet).
+- Licenses to verify: Food Icons FREE and Food Pack (no license text in the zips), Cooking & Kitchen Icons = CC0 (ok).
 - Cave Items pack (ore icons, nodes, pickaxe icon): the zip has NO license file — author/license still unverified
   (marked TODO in CREDITS.md). Replace or confirm before publishing.
 - The mine entrance sprite is composed by hand (the free Pixel Crawler pack has no mine door); can be swapped via

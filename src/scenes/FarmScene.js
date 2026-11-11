@@ -33,7 +33,7 @@ export default class FarmScene extends Phaser.Scene {
 
   preload() {
     preloadAssets(this, [
-      'map_farm', 'tiles_farm', 'soil_dry', 'soil_wet', 'player', 'player_actions', 'animal_chicken', 'animal_cow',
+      'map_farm', 'tiles_farm', 'soil_dry', 'soil_wet', 'player', 'player_actions', 'animal_chicken', 'animal_cow', 'kitchen',
       ...Object.keys(CROPS).map((id) => `cropsheet_${id}`),
       ...SFX_KEYS
     ]);

@@ -67,9 +67,9 @@ export function createKitchenTexture(scene) {
 export function addKitchen(scene, x, y) {
   const img = scene.add.image(x, y, 'kitchen').setOrigin(0.5, 1).setDepth(y - 1);
   [[-3, 0], [4, 700]].forEach(([dx, delay]) => {
-    const puff = scene.add.circle(x + dx, y - 28, 2, 0xf6e7c1, 0.55).setDepth(y);
+    const puff = scene.add.circle(x + dx, y - 30, 2, 0xf6e7c1, 0.55).setDepth(y);
     scene.tweens.add({
-      targets: puff, y: y - 42, alpha: 0, scale: 1.8, duration: 1500, delay, repeat: -1
+      targets: puff, y: y - 44, alpha: 0, scale: 1.8, duration: 1500, delay, repeat: -1
     });
   });
   return img;
