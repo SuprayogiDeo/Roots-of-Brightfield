@@ -124,5 +124,16 @@
   "settings.controls": "Control size",
   "settings.size.s": "Small",
   "settings.size.m": "Medium",
-  "settings.size.l": "Large"
+  "settings.size.l": "Large",
+  "prompt.toBeach": "Go to the beach",
+  "prompt.toFarmBeach": "Go back to the farm",
+  "prompt.cast": "Cast line",
+  "beach.arrive": "Salt air and soft waves. Equip the Fishing Rod, face the water and tap A to cast.",
+  "fish.wait": "Waiting for a bite...",
+  "fish.reel": "Tap A in the green zone!",
+  "fish.early": "Too early! The fish got scared.",
+  "fish.away": "Too slow... it got away.",
+  "fish.lost": "The fish slipped off the hook!",
+  "fish.caught": "Caught {name}!",
+  "fish.cancel": "You reel the line back in."
 }

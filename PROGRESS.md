@@ -91,9 +91,23 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
   - Fence art rebuilt from the original Fences.png so horizontal rails connect; row-1 end posts replaced.
   - Finishing the Old Shed quest now gives 1 Chicken + 3 Animal Feed so animals are visible early.
 
-## NEXT (Step 3.3 / Phase 4 start)
+## PHASE 4
+- **Step 4.1 — Beach + fishing**
+  - New `BeachScene` (`public/assets/maps/beach.json`, tileset `beach_tiles.png`): grass -> sand -> sea, a pier
+    (walkable, 2 tiles wide) with water on both sides, palms/rocks/shells/boat/fishing hut as map-driven **props**
+    (object layer `Props`; solid footprints are listed in `BeachScene.js` `SOLID`).
+  - Transition: Farm south edge (`to_beach` zone, x 256-384, y 370) <-> Beach north edge (`to_farm`). Arrival points
+    `from_beach` (Farm) / `from_farm` (Beach). Title "Continue" resumes on the Beach if saved there.
+  - **Fishing minigame** (`src/systems/fishing.js`): select the Fishing Rod, face water, Tap A to cast ->
+    wait for "!" -> Tap A to hook -> tap A while the marker is in the green zone (1-3 hits depending on the fish).
+    Too early = fish flees, too slow / miss = it escapes. Walking away while waiting cancels the cast.
+  - 6 fish (Sardine, Mackerel, Sea Bass, Catfish, Red Snapper, Golden Carp: 15-120g) — sell at the Shipping Bin like
+    crops. +3 XP per catch. Level adds a little to the green zone width.
+  - Real icons for the 6 fish + Fishing Rod. New texts in EN/ID.
+
+## NEXT (Step 4.2)
 - Village house interiors, a second quest chain, real item icons (UI pack), NPC art.
-- Phase 4: Forest / Beach / Mine, fishing, mining, crafting.
+- Phase 4: Forest / Mine, mining, crafting; fish quest / recipes; beach NPC; shells to collect.
 
 ## KNOWN ISSUES
 - Item icons, UI buttons, joystick, logo and PWA icons are still code-drawn placeholders.

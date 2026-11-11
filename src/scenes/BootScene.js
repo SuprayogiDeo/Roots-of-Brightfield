@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { preloadAssets } from '../systems/assets.js';
+import { preloadAssets, FISH_IDS } from '../systems/assets.js';
 
 // Fonts are loaded in main.js before the game starts. Boot preloads the UI click sound
 // so menus have audio even before the Farm scene loads the rest.
@@ -9,7 +9,7 @@ export default class BootScene extends Phaser.Scene {
   }
 
   preload() {
-    preloadAssets(this, ['sfx_click', 'item_egg', 'item_milk']);
+    preloadAssets(this, ['sfx_click', 'item_egg', 'item_milk', 'item_fishing_rod', ...FISH_IDS.map((n) => `item_${n}`)]);
   }
 
   create() {

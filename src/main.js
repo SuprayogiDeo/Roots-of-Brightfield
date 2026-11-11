@@ -8,6 +8,7 @@ import PrologueScene from './scenes/PrologueScene.js';
 import SettingsScene from './scenes/SettingsScene.js';
 import FarmScene from './scenes/FarmScene.js';
 import VillageScene from './scenes/VillageScene.js';
+import BeachScene from './scenes/BeachScene.js';
 import ShopScene from './scenes/ShopScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import { setupMobileGuards, setupLifecycle } from './systems/mobile.js';
@@ -77,7 +78,7 @@ async function start() {
       touch: { capture: true }
     },
     scene: [BootScene, TitleScene, CharacterSelectScene, PrologueScene, SettingsScene, FarmScene,
-      VillageScene, ShopScene, MenuScene]
+      VillageScene, BeachScene, ShopScene, MenuScene]
   });
   setupLifecycle(game);
   setupAutoFullscreen(game);

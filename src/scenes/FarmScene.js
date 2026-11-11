@@ -9,7 +9,7 @@ import { loadSave, writeSave } from '../systems/save.js';
 import { CROPS, isReady, cropFrame, createCropTextures, createBinTexture } from '../systems/crops.js';
 import { ITEMS, addItem, consumeSlot } from '../systems/items.js';
 import { advanceQuest, questObjectiveKey, QUEST_REWARD } from '../systems/quests.js';
-import { playSfx, SFX_KEYS } from '../systems/audio.js';
+import { playSfx, SFX_KEYS, createFootsteps } from '../systems/audio.js';
 import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
 import { AnimalManager, ANIMALS, newAnimal } from '../systems/animals.js';
 import { addXp, XP_GAIN } from '../systems/xp.js';
@@ -86,6 +86,8 @@ export default class FarmScene extends Phaser.Scene {
     // --- player ---
     this.facing = 'down';
     this.moving = false;
+    this.lastTileKey = null;
+    this.footsteps = createFootsteps(this);
     this.zone = null;
     this.realPlayer = usingRealPlayer(this);
     this.player = this.realPlayer
@@ -126,6 +128,7 @@ export default class FarmScene extends Phaser.Scene {
     this.events.on(Phaser.Scenes.Events.PAUSE, this.persist, this); // tab hidden / app minimized
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.persist();
+      this.footsteps.stop();
       this.controls.destroy();
       this.input.keyboard.off('keydown', this.onKey);
       this.events.off(Phaser.Scenes.Events.PAUSE, this.persist, this);
@@ -301,6 +304,8 @@ export default class FarmScene extends Phaser.Scene {
       this.hud.showMessage(t('sign.farm'));
     } else if (action === 'to_village') {
       this.travel('village');
+    } else if (action === 'to_beach') {
+      this.travel('beach');
     } else if (action === 'bin') {
       this.sellHarvest();
     }
@@ -397,6 +402,7 @@ export default class FarmScene extends Phaser.Scene {
     if (action === 'sign') return t('prompt.readSign');
     if (action === 'bin') return t('prompt.sell');
     if (action === 'to_village') return t('prompt.toVillage');
+    if (action === 'to_beach') return t('prompt.toBeach');
     return null;
   }
 
@@ -408,7 +414,7 @@ export default class FarmScene extends Phaser.Scene {
     writeSave(this.save);
     this.cameras.main.fadeOut(250, 0, 0, 0);
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-      this.scene.start('Village');
+      this.scene.start(to === 'beach' ? 'Beach' : 'Village');
     });
   }
 
@@ -459,6 +465,16 @@ export default class FarmScene extends Phaser.Scene {
     }
     this.moving = moving;
     this.player.setDepth(this.player.y + (this.realPlayer ? 8 : 0));
+    this.footsteps.update(moving, this.controls.isRunning(), delta);
+
+    // splash when the player steps onto a freshly watered (wet) soil tile
+    const under = this.tileUnderPlayer();
+    const tileKey = `${under.tx},${under.ty}`;
+    if (tileKey !== this.lastTileKey) {
+      this.lastTileKey = tileKey;
+      const wet = this.save.plots[tileKey];
+      if (moving && wet && wet.watered) playSfx(this, 'sfx_splash');
+    }
 
     // contextual prompt: interact zone first, then the tile under the player
     const feet = this.player.body.center;

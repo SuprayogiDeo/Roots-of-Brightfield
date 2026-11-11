@@ -6,7 +6,7 @@ import { createFarmTileset, createPlayerTextures, setPlayerDir, usingRealPlayer 
 import TouchControls from '../systems/touchControls.js';
 import Hud, { HOTBAR_SIZE } from '../systems/hud.js';
 import { loadSave, writeSave } from '../systems/save.js';
-import { playSfx, SFX_KEYS } from '../systems/audio.js';
+import { playSfx, SFX_KEYS, createFootsteps } from '../systems/audio.js';
 import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
 import Dialogue from '../systems/dialogue.js';
 import { NPCS, greet, lineFor } from '../systems/npcs.js';
@@ -70,6 +70,7 @@ export default class VillageScene extends Phaser.Scene {
 
     this.facing = 'down';
     this.moving = false;
+    this.footsteps = createFootsteps(this);
     this.zone = null;
     this.realPlayer = usingRealPlayer(this);
     this.player = this.realPlayer
@@ -107,6 +108,7 @@ export default class VillageScene extends Phaser.Scene {
     this.events.on(Phaser.Scenes.Events.PAUSE, this.persist, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.persist();
+      this.footsteps.stop();
       this.controls.destroy();
       this.input.keyboard.off('keydown', this.onKey);
       this.events.off(Phaser.Scenes.Events.PAUSE, this.persist, this);
@@ -188,7 +190,7 @@ export default class VillageScene extends Phaser.Scene {
     writeSave(this.save);
   }
 
-  update() {
+  update(time, delta) {
     if (!this.player) return;
     const busy = this.dialogue.isOpen() || this.hud.messageOpen();
     if (!this.dialogue.isOpen() && this.hotbarHidden) { this.hotbarHidden = false; this.hud.setHotbarVisible(true); }
@@ -211,6 +213,7 @@ export default class VillageScene extends Phaser.Scene {
     }
     this.moving = moving;
     this.player.setDepth(this.player.y + (this.realPlayer ? 8 : 0));
+    this.footsteps.update(moving, this.controls.isRunning(), delta);
 
     const feet = this.player.body.center;
     this.zone = this.zones.find((z) => z.rect.contains(feet.x, feet.y)) || null;

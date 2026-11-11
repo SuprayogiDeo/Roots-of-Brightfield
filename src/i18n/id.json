@@ -124,5 +124,16 @@
   "settings.controls": "Ukuran kontrol",
   "settings.size.s": "Kecil",
   "settings.size.m": "Sedang",
-  "settings.size.l": "Besar"
+  "settings.size.l": "Besar",
+  "prompt.toBeach": "Pergi ke pantai",
+  "prompt.toFarmBeach": "Kembali ke kebun",
+  "prompt.cast": "Lempar kail",
+  "beach.arrive": "Udara asin dan ombak lembut. Pegang Pancing, hadap ke laut, lalu tekan A untuk melempar.",
+  "fish.wait": "Menunggu ikan menggigit...",
+  "fish.reel": "Tekan A di zona hijau!",
+  "fish.early": "Terlalu cepat! Ikannya kabur.",
+  "fish.away": "Terlalu lambat... ikannya kabur.",
+  "fish.lost": "Ikannya lepas dari kail!",
+  "fish.caught": "Dapat {name}!",
+  "fish.cancel": "Kamu menarik kail kembali."
 }

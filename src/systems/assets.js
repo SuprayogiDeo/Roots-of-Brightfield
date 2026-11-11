@@ -12,6 +12,14 @@
 //   sfx      : { src: 'assets/sfx/kenney_*.ogg' }
 // ---------------------------------------------------------------------------
 
+export const BEACH_PROPS = [
+  'palm_a', 'palm_b', 'palm_big', 'palm_pair', 'rock_big', 'rock_tall', 'rock_s1', 'rock_s2',
+  'shell_star', 'shell_blue', 'shell_pink', 'pebble', 'coconut', 'hut', 'boat', 'barrel1', 'barrel2'
+];
+export const FISH_IDS = [
+  'fish_sardine', 'fish_mackerel', 'fish_bass', 'fish_catfish', 'fish_snapper', 'fish_golden_carp'
+];
+
 export const ASSET_MANIFEST = {
   // Tiled map (real file). Tile ids inside it match the tileset below.
   map_farm: { type: 'tilemap', src: 'assets/maps/farm.json' },
@@ -33,6 +41,13 @@ export const ASSET_MANIFEST = {
   animal_chicken: { type: 'spritesheet', src: 'assets/animals/chicken.png', frameWidth: 32, frameHeight: 32 },
   animal_cow: { type: 'spritesheet', src: 'assets/animals/cow.png', frameWidth: 32, frameHeight: 32 },
 
+  // Beach (Step 4.1) — Time Fantasy beach tileset (finalbossblues) + Free Fishing pack (CraftPix).
+  map_beach: { type: 'tilemap', src: 'assets/maps/beach.json' },
+  tiles_beach: { type: 'image', src: 'assets/tiles/beach_tiles.png' },
+  ...Object.fromEntries(BEACH_PROPS.map((n) => [`prop_${n}`, { type: 'image', src: `assets/beach/${n}.png` }])),
+  ...Object.fromEntries(FISH_IDS.map((n) => [`item_${n}`, { type: 'image', src: `assets/items/${n}.png` }])),
+  item_fishing_rod: { type: 'image', src: 'assets/items/fishing_rod.png' },
+
   // Item icons (16x16) — Sunnyside World. Key = `item_<id>`; others are still code-drawn.
   item_egg: { type: 'image', src: 'assets/items/egg.png' },
   item_milk: { type: 'image', src: 'assets/items/milk.png' },
@@ -41,7 +56,12 @@ export const ASSET_MANIFEST = {
   sfx_click: { type: 'audio', src: 'assets/sfx/sfx_click.ogg' },
   sfx_till: { type: 'audio', src: 'assets/sfx/sfx_till.ogg' },
   sfx_plant: { type: 'audio', src: 'assets/sfx/sfx_plant.ogg' },
-  sfx_water: { type: 'audio', src: 'assets/sfx/sfx_water.ogg' },
+  // Watering the crop — freesound_community "water-splash-102492" (see CREDITS.md). ogg + mp3 fallback.
+  sfx_water: { type: 'audio', src: ['assets/sfx/sfx_water.ogg', 'assets/sfx/sfx_water.mp3'] },
+  // Water splash when stepping on wet (watered) soil — freesound_community "splash-6213".
+  sfx_splash: { type: 'audio', src: ['assets/sfx/sfx_splash.ogg', 'assets/sfx/sfx_splash.mp3'] },
+  // Looping wet footsteps while walking — spinopel "water-splash-290839" (seamless loop).
+  sfx_steps_wet: { type: 'audio', src: ['assets/sfx/sfx_steps_wet.ogg', 'assets/sfx/sfx_steps_wet.mp3'] },
   sfx_harvest: { type: 'audio', src: 'assets/sfx/sfx_harvest.ogg' },
   sfx_coins: { type: 'audio', src: 'assets/sfx/sfx_coins.ogg' },
   sfx_door: { type: 'audio', src: 'assets/sfx/sfx_door.ogg' },

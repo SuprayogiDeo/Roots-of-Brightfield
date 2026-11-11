@@ -24,7 +24,15 @@ export const ITEMS = {
   backpack: { name: 'Backpack' },
   animal_feed: { name: 'Animal Feed', cost: 6 },
   egg: { name: 'Egg', price: 18 },
-  milk: { name: 'Milk', price: 45 }
+  milk: { name: 'Milk', price: 45 },
+
+  // Fish (Step 4.1) — sold at the Shipping Bin like crops.
+  fish_sardine: { name: 'Sardine', price: 15 },
+  fish_mackerel: { name: 'Mackerel', price: 25 },
+  fish_bass: { name: 'Sea Bass', price: 35 },
+  fish_catfish: { name: 'Catfish', price: 45 },
+  fish_snapper: { name: 'Red Snapper', price: 55 },
+  fish_golden_carp: { name: 'Golden Carp', price: 120 }
 };
 
 export const STACK_MAX = 99;

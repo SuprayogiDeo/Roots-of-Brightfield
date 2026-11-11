@@ -36,13 +36,30 @@ Used for: crop growth stages.
 - `sfx_click.ogg` — UI Audio `click1.ogg`
 - `sfx_till.ogg` — RPG Audio `footstep00.ogg`
 - `sfx_plant.ogg` — RPG Audio `cloth1.ogg`
-- `sfx_water.ogg` — RPG Audio `metalPot1.ogg`
+- `sfx_water.ogg` / `.mp3` — (replaced, no longer Kenney) see "Water sounds" below
 - `sfx_harvest.ogg` — RPG Audio `knifeSlice.ogg`
 - `sfx_coins.ogg` — RPG Audio `handleCoins.ogg`
 - `sfx_door.ogg` — RPG Audio `doorOpen_1.ogg`
 - `sfx_deny.ogg` — Digital Audio `lowDown.ogg`
 - `jingle_quest.ogg` — Music Jingles `jingles_STEEL09.ogg`
 - `jingle_day.ogg` — Music Jingles `jingles_PIZZI00.ogg`
+
+### Water sounds (Freesound / Pixabay, converted to ogg + mp3)
+- `sfx_water` (watering a crop) — freesound_community, "water-splash-102492".
+- `sfx_splash` (stepping on wet soil) — freesound_community, "splash-6213".
+- `sfx_steps_wet` (wet footsteps loop while walking, Farm + Village) — spinopel, "water-splash-290839";
+  the clip is trimmed into a seamless loop (tail crossfaded into the head).
+- Check each file's license on its original page before publishing the game commercially.
+
+### Beach + Fishing (Step 4.1)
+- **Time Fantasy — Beach Tileset** by **finalbossblues** (timefantasy.net; free release, credit the artist).
+  Used for: sand/water/palm/rock/shell/pier pixels. `public/assets/tiles/beach_tiles.png` is a 16x16 sheet
+  composed from `beach_tileset.png` (sand, water, pier planks) plus shoreline and grass-to-sand edge tiles
+  generated from its colours. `public/assets/beach/*.png` (palms, rocks, shells, coconut) are crops of it.
+- **Free Fishing Game Assets — Pixel Art Pack** (CraftPix.net, free pack; do not redistribute the files as a pack).
+  Used for: fish icons and rod icon (`public/assets/items/fish_*.png`, `fishing_rod.png`, downscaled 32->16 from
+  `4 Icons`), the fishing hut, boat and barrels (`public/assets/beach/hut.png`, `boat.png`, `barrel1/2.png`).
+- Not used (yet): `Beach.zip` (sand-castle sprite sheets), the Fisherman character animations.
 
 ### Not used yet (kept out of the repo until needed)
 - The rest of **Sunnyside World** (village, NPCs, UI) — planned for Phase 2.
