@@ -143,5 +143,14 @@
   "prompt.leaveMine": "Leave the mine",
   "mine.arrive": "Cool, dark and quiet. Lanterns flicker on the wall and ore glitters in the rock. Select the Pickaxe and tap A at a rock to mine it.",
   "prompt.mine": "Mine",
-  "mine.needPickaxe": "Select the Pickaxe on the hotbar to mine."
+  "mine.needPickaxe": "Select the Pickaxe on the hotbar to mine.",
+  "prompt.cook": "Cook at the Kitchen",
+  "kitchen.title": "Kitchen",
+  "kitchen.pantry": "Pantry",
+  "kitchen.cook": "Cook",
+  "kitchen.cooked": "Cooked {item}!",
+  "kitchen.missing": "Not enough ingredients.",
+  "kitchen.bought": "Bought {item}.",
+  "item.dish": "A cooked dish. Sells well at the Shipping Bin.",
+  "item.ingredient": "Cooking ingredient. Used at the Kitchen."
 }

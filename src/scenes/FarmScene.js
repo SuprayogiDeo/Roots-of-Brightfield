@@ -7,6 +7,7 @@ import TouchControls from '../systems/touchControls.js';
 import Hud, { HOTBAR_SIZE } from '../systems/hud.js';
 import { loadSave, writeSave } from '../systems/save.js';
 import { CROPS, isReady, cropFrame, createCropTextures, createBinTexture } from '../systems/crops.js';
+import { createKitchenTexture, addKitchen } from '../systems/crafting.js';
 import { ITEMS, addItem, consumeSlot } from '../systems/items.js';
 import { advanceQuest, questObjectiveKey, QUEST_REWARD } from '../systems/quests.js';
 import { playSfx, SFX_KEYS, createFootsteps } from '../systems/audio.js';
@@ -50,6 +51,7 @@ export default class FarmScene extends Phaser.Scene {
     createPlayerTextures(this, this.gender);
     createCropTextures(this);
     createBinTexture(this);
+    createKitchenTexture(this);
 
     // --- map ---
     const map = this.make.tilemap({ key: 'map_farm' });
@@ -75,6 +77,7 @@ export default class FarmScene extends Phaser.Scene {
 
     // Shipping Bin sprite (static decoration above the Objects layer).
     this.add.image(408, 160, 'bin').setOrigin(0.5, 1).setDepth(159);
+    addKitchen(this, 400, 112); // cooking station north of the field
 
     // --- plots (tilled soil + crops) ---
     this.plotViews = new Map();
@@ -369,6 +372,9 @@ export default class FarmScene extends Phaser.Scene {
       this.travel('forest');
     } else if (action === 'bin') {
       this.sellHarvest();
+    } else if (action === 'kitchen') {
+      this.persist();
+      goTo(this, 'Craft', { from: 'Farm' });
     }
   }
 
@@ -462,6 +468,7 @@ export default class FarmScene extends Phaser.Scene {
     if (action === 'shed') return this.save.flags.shedOpen ? t('prompt.sleep') : t('prompt.openShed');
     if (action === 'sign') return t('prompt.readSign');
     if (action === 'bin') return t('prompt.sell');
+    if (action === 'kitchen') return t('prompt.cook');
     if (action === 'to_village') return t('prompt.toVillage');
     if (action === 'to_beach') return t('prompt.toBeach');
     if (action === 'to_forest') return t('prompt.toForest');

@@ -203,12 +203,30 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
     probe in all 4 directions, all 22 nodes have a def) passes. **Not run in a real browser** — tune on the phone:
     `windup` / `hold` of `pickaxe` in `toolAnim.js` `TOOLS`, `findTarget` probe size in `mining.js`, effect sizes in `miningFx.js`.
 
+- **Step 4.6 — Crafting / cooking + pickaxe icon fix**
+  - `public/assets/items/pickaxe.png`: the thick white outline was removed (flood-fill from outside, 80 px); the dark
+    inner outline stays, so the icon reads on the hotbar/Bag.
+  - **Kitchen** (`src/systems/crafting.js`, `src/scenes/CraftScene.js`, new): a stone stove + pot north of the Farm field
+    (code-drawn placeholder texture `kitchen`, steam puffs; Tiled zone `kitchen` added to `farm.json`, object id 26).
+    Stand in front -> **Tap A: Cook at the Kitchen** -> `Craft` scene (menu style, Back returns to the Farm).
+  - Recipes (`RECIPES`): **Sambal** = 2 Chili + 1 Tomato + 1 Salt (sells 170g); **Salted Egg** = 1 Egg + 1 Salt (60g);
+    **Coffee** = 2 Coffee Beans (75g). Cooking gives +4 XP (`XP_GAIN.cook`), instant. Bag is checked first on a copy
+    (`craft()` returns ok / missing / full), so ingredients are never lost when the bag is full.
+  - **Pantry** inside the Kitchen: Salt 10g, Coffee Beans 15g. These two have **no sell price on purpose** so the Shipping
+    Bin / Shop "sell all" never sells your ingredients. Dishes sell at the Bin like crops.
+  - New items (placeholder code-drawn icons): `salt`, `coffee_beans`, `sambal`, `salted_egg`, `coffee`. Bag detail shows
+    dish / ingredient hints. New i18n keys (EN + ID): `prompt.cook`, `kitchen.*`, `item.dish`, `item.ingredient`.
+  - No save-schema change (still v6). Checked: `vite build` OK + headless-browser test (prompt, open Craft, buy, cook all 3,
+    missing-ingredients message, coins/XP correct, Mine scene still loads). Not run on a real phone.
+  - Step 4.2 (Mine map + mining) was already in this build (Step 4.5 above) — nothing to redo.
+
 ## NEXT
-- Crafting (furnace: ore -> bars), forest foraging/chopping (use `rig.playTool('axe', ...)`), village house interiors,
+- Furnace (ore -> bars) as a 2nd station, forest foraging/chopping (use `rig.playTool('axe', ...)`), village house interiors,
   second quest chain.
 - Mining ideas not done: tool upgrades (more damage = fewer hits), rare double drops, mine level 2 (ladder), energy-free by design.
 
 ## KNOWN ISSUES
+- Kitchen sprite and the 5 new food/ingredient icons are code-drawn placeholders (no cooking art in the packs yet).
 - Cave Items pack (ore icons, nodes, pickaxe icon): the zip has NO license file — author/license still unverified
   (marked TODO in CREDITS.md). Replace or confirm before publishing.
 - The mine entrance sprite is composed by hand (the free Pixel Crawler pack has no mine door); can be swapped via

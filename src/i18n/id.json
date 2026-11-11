@@ -143,5 +143,14 @@
   "prompt.leaveMine": "Keluar dari tambang",
   "mine.arrive": "Sejuk, gelap, dan sunyi. Obor berkedip di dinding dan bijih berkilau di dalam batu. Pilih Pickaxe lalu tekan A di dekat batu untuk menambang.",
   "prompt.mine": "Tambang",
-  "mine.needPickaxe": "Pilih Pickaxe di hotbar untuk menambang."
+  "mine.needPickaxe": "Pilih Pickaxe di hotbar untuk menambang.",
+  "prompt.cook": "Memasak di Kitchen",
+  "kitchen.title": "Kitchen",
+  "kitchen.pantry": "Bahan masakan",
+  "kitchen.cook": "Masak",
+  "kitchen.cooked": "Berhasil memasak {item}!",
+  "kitchen.missing": "Bahan belum cukup.",
+  "kitchen.bought": "Membeli {item}.",
+  "item.dish": "Hidangan matang. Laku mahal di Shipping Bin.",
+  "item.ingredient": "Bahan masak. Dipakai di Kitchen."
 }

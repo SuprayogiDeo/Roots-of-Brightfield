@@ -211,6 +211,8 @@ export default class MenuScene extends Phaser.Scene {
     if (TOOLS.includes(item.id)) parts.push(t('item.tool'));
     if (def.seed) parts.push(t('item.seed', { days: CROPS[def.seed].days }));
     if (item.id === 'animal_feed') parts.push(t('item.feed'));
+    if (def.dish) parts.push(t('item.dish'));
+    if (def.ingredient) parts.push(t('item.ingredient'));
     if (def.price) parts.push(t('item.sell', { price: def.price }));
     this.detDesc.setText(parts.join('\n'));
   }
