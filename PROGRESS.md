@@ -125,9 +125,16 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
     Aquamarine 90g, Amethyst 100g, Emerald 120g, Ruby 140g. Pickaxe now has a real icon too.
   - **Mining itself is NOT in yet** — nodes are solid and just look pretty (arrival text says so).
 
-## NEXT (Step 4.3)
-- Mining: select Pickaxe, face a node, Tap A -> hit animation, shake, 3 hits, drops ore/stone (+XP), node turns to
-  rubble and respawns next day. Save the mined nodes in the save file (schema v6).
+- **Step 4.2b — mine door cleared**
+  - Removed the big rock (`rock_b` at x 280, y 128) that stood in front of the Forest's mine door. Checked that no
+    solid prop blocks the path to the `to_mine` zone and that the `from_mine` spawn is not inside anything solid.
+
+## NEXT
+- **Step 4.3** — Farm animations: hoe, watering can (and axe) from Cute Fantasy `Player/Player_Actions.png`;
+  simple code effects for plant / harvest / feed.
+- **Step 4.4** — Fishing animation (code-drawn: rod pose, line, bobber, splash, jumping fish).
+- **Step 4.5** — Mining: select Pickaxe, face a node, Tap A -> swing animation, shake, 3 hits, drops ore/stone (+XP),
+  node turns to rubble and respawns next day; mined nodes saved (new save schema version).
 - Then: crafting (furnace: ore -> bars), forest foraging/chopping, village house interiors, second quest chain.
 
 ## KNOWN ISSUES
