@@ -13,6 +13,7 @@ import { playSfx, SFX_KEYS, createFootsteps } from '../systems/audio.js';
 import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
 import { AnimalManager, ANIMALS, newAnimal } from '../systems/animals.js';
 import { addXp, XP_GAIN } from '../systems/xp.js';
+import ActionRig, { fxPlant, fxHarvest, fxFeed, fxCollect } from '../systems/toolAnim.js';
 
 const DOOR_CLOSED = 13; // gid in farm.json
 const DOOR_OPEN = 14;
@@ -31,7 +32,7 @@ export default class FarmScene extends Phaser.Scene {
 
   preload() {
     preloadAssets(this, [
-      'map_farm', 'tiles_farm', 'soil_dry', 'soil_wet', 'player', 'animal_chicken', 'animal_cow',
+      'map_farm', 'tiles_farm', 'soil_dry', 'soil_wet', 'player', 'player_actions', 'animal_chicken', 'animal_cow',
       ...Object.keys(CROPS).map((id) => `cropsheet_${id}`),
       ...SFX_KEYS
     ]);
@@ -98,6 +99,8 @@ export default class FarmScene extends Phaser.Scene {
     else this.player.body.setSize(8, 6).setOffset(4, 9);
     setPlayerDir(this, this.player, this.gender, 'down', false);
     this.player.setCollideWorldBounds(true);
+    // tool swing / crouch overlay + movement lock (Step 4.3)
+    this.rig = new ActionRig(this, this.player);
     this.physics.add.collider(this.player, [this.ground, this.objLayer]);
 
     const cam = this.cameras.main;
@@ -196,7 +199,7 @@ export default class FarmScene extends Phaser.Scene {
     if (act.kind === 'till') {
       plots[act.key] = { crop: null, grown: 0, watered: false };
     } else if (act.kind === 'plant') {
-      const index = inv.row * HOTBAR_SIZE + inv.sel;
+      const index = act.slot ?? (inv.row * HOTBAR_SIZE + inv.sel); // slot captured when A was pressed
       consumeSlot(inv, index);
       plots[act.key].crop = act.crop;
       plots[act.key].grown = 0;
@@ -207,7 +210,7 @@ export default class FarmScene extends Phaser.Scene {
       const plot = plots[act.key];
       const crop = CROPS[plot.crop];
       const left = addItem(inv, crop.produce, 1);
-      if (left > 0) { this.hud.toast(t('msg.bagFull'), '#C4553F'); playSfx(this, 'sfx_deny'); return; }
+      if (left > 0) { this.hud.toast(t('msg.bagFull'), '#C4553F'); playSfx(this, 'sfx_deny'); return false; }
       delete plots[act.key];
       const view = this.plotViews.get(act.key);
       if (view) { view.soil.destroy(); view.plant.destroy(); this.plotViews.delete(act.key); }
@@ -218,10 +221,48 @@ export default class FarmScene extends Phaser.Scene {
     playSfx(this, `sfx_${act.kind}`);
     this.hud.refresh();
     if (plots[act.key]) this.drawPlot(act.key);
-    this.pulse(0xf6e7c1);
+    if (!this.rig.ready) this.pulse(0xf6e7c1); // placeholder art only; real art has the pose + effects
     this.gainXp(act.kind);
     this.checkQuest(act.kind);
     this.persist();
+    return true;
+  }
+
+  // Play the pose for a farm action; the action itself is committed on the impact frame.
+  startFarmAction(act) {
+    const inv = this.save.inventory;
+    act.slot = inv.row * HOTBAR_SIZE + inv.sel;
+    const [tx, ty] = act.key.split(',').map(Number);
+    const cx = tx * 16 + 8;
+    const cy = ty * 16 + 8;
+    const done = () => this.restoreIdle();
+    if (act.kind === 'till' || act.kind === 'water') {
+      this.rig.playTool(act.kind === 'till' ? 'hoe' : 'water', this.facing, {
+        onImpact: () => { if (!this.sleeping) this.doFarmAction(act); },
+        onDone: done
+      });
+      return;
+    }
+    this.rig.playCrouch(this.facing, {
+      onImpact: () => {
+        if (this.sleeping || !this.doFarmAction(act)) return;
+        if (act.kind === 'plant') fxPlant(this, cx, cy + 2, (this.plotViews.get(act.key) || {}).plant);
+        else fxHarvest(this, cx, cy);
+      },
+      onDone: done
+    });
+  }
+
+  // Back to the normal idle pose after an action (a held joystick takes over on the next frame).
+  restoreIdle() {
+    setPlayerDir(this, this.player, this.gender, this.facing, false);
+  }
+
+  faceToward(x, y) {
+    const c = this.player.body.center;
+    const dx = x - c.x;
+    const dy = y - c.y;
+    this.facing = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
   }
 
   // ---------------- animals ----------------
@@ -237,29 +278,46 @@ export default class FarmScene extends Phaser.Scene {
     return { kind: 'hint', a, prompt: null };
   }
 
+  // Face the animal, bend down, and commit feed / collect at the lowest point.
+  startAnimalAction(act) {
+    if (act.kind === 'hint') { this.doAnimalAction(act); return; }
+    const inv = this.save.inventory;
+    act.slot = inv.row * HOTBAR_SIZE + inv.sel;
+    const s = act.a.sprite;
+    this.faceToward(s.x, s.y);
+    this.rig.playCrouch(this.facing, {
+      onImpact: () => {
+        if (this.sleeping || !this.doAnimalAction(act)) return;
+        (act.kind === 'feed' ? fxFeed : fxCollect)(this, s.x, s.y);
+      },
+      onDone: () => this.restoreIdle()
+    });
+  }
+
   doAnimalAction(act) {
     const def = ANIMALS[act.a.data.type];
     if (act.kind === 'hint') {
       this.hud.toast(act.a.data.fed ? t('msg.animalHappy', { name: def.name }) : t('msg.needFeed'), '#F6E7C1');
-      return;
+      return true;
     }
     const inv = this.save.inventory;
     if (act.kind === 'feed') {
-      consumeSlot(inv, inv.row * HOTBAR_SIZE + inv.sel);
+      consumeSlot(inv, act.slot ?? (inv.row * HOTBAR_SIZE + inv.sel));
       act.a.data.fed = true;
       this.hud.toast(t('msg.fed', { name: def.name }), '#639922');
       playSfx(this, 'sfx_plant');
     } else {
-      if (addItem(inv, def.product, 1) > 0) { this.hud.toast(t('msg.bagFull'), '#C4553F'); playSfx(this, 'sfx_deny'); return; }
+      if (addItem(inv, def.product, 1) > 0) { this.hud.toast(t('msg.bagFull'), '#C4553F'); playSfx(this, 'sfx_deny'); return false; }
       act.a.data.ready = false;
       this.hud.toast(`+1 ${ITEMS[def.product].name}`, '#639922');
       playSfx(this, 'sfx_harvest');
     }
     this.animals.refreshBubble(act.a);
     this.hud.refresh();
-    this.pulse(0xf6e7c1);
+    if (!this.rig.ready) this.pulse(0xf6e7c1);
     this.gainXp(act.kind);
     this.persist();
+    return true;
   }
 
   // XP for an action; level-ups raise max stamina (see systems/xp.js).
@@ -276,13 +334,14 @@ export default class FarmScene extends Phaser.Scene {
 
   // ---------------- interactions ----------------
   pressA() {
+    if (this.rig.busy) return; // locked while a tool swing / crouch plays
     if (this.hud.messageOpen()) { this.hud.hideMessage(); return; }
     if (this.zone) { this.interact(this.zone.action); return; }
     const animalAct = this.animalAction();
-    if (animalAct) { this.doAnimalAction(animalAct); return; }
+    if (animalAct) { this.startAnimalAction(animalAct); return; }
     const { tx, ty } = this.tileUnderPlayer();
     const act = this.farmActionAt(tx, ty);
-    if (act) this.doFarmAction(act);
+    if (act) this.startFarmAction(act);
     else this.pulse(0xef9f27, '!');
   }
 
@@ -428,6 +487,7 @@ export default class FarmScene extends Phaser.Scene {
   }
 
   openMenu() {
+    if (this.rig && this.rig.busy) return;
     this.persist();
     goTo(this, 'Menu', { from: 'Farm' });
   }
@@ -450,6 +510,13 @@ export default class FarmScene extends Phaser.Scene {
   update(time, delta) {
     if (!this.player) return;
     this.animals.update(delta);
+    if (this.rig.busy) { // movement is locked during a tool swing / crouch
+      this.player.setVelocity(0, 0);
+      this.moving = false;
+      this.footsteps.update(false, false, delta);
+      this.hud.setPrompt(null);
+      return;
+    }
     const move = this.controls.getMove();
     const speed = this.controls.isRunning() ? 105 : 62;
     this.player.setVelocity(move.x * speed, move.y * speed);

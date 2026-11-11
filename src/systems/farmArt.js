@@ -62,6 +62,12 @@ export function createFarmTileset(scene) {
 //   row 0 idle down · 1 idle side · 2 idle up · 3 walk down · 4 walk side · 5 walk up
 const REAL_ROW = { idle: { down: 0, side: 1, up: 2 }, walk: { down: 3, side: 4, up: 5 } };
 
+// First frame of the idle row for a facing (used by the crouch effect, see toolAnim.js).
+export function idleFrameFor(dir) {
+  const d = dir === 'up' || dir === 'down' ? dir : 'side';
+  return REAL_ROW.idle[d] * 6;
+}
+
 export function usingRealPlayer(scene) {
   return scene.textures.exists('player');
 }

@@ -16,6 +16,8 @@ sign), the Old Shed (roof / wall / door tiles), tilled soil, and the player char
     `House_1_Wood_Base_Blue.png`.
   - `public/assets/tiles/soil_dry.png` / `soil_wet.png` — from `Tiles/FarmLand_Tile.png`.
   - `public/assets/characters/player.png` — unmodified copy of `Player/Player.png`.
+  - `public/assets/characters/player_actions.png` — unmodified copy of `Player/Player_Actions.png`
+    (tool poses: pickaxe, axe, hoe, watering can).
 
 ### Sunnyside World Asset Pack V2.1 — by **Daniel Diggle (RareCandy)**
 Used for: crop growth stages.

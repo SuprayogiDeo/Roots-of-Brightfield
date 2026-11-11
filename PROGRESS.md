@@ -129,11 +129,32 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
   - Removed the big rock (`rock_b` at x 280, y 128) that stood in front of the Forest's mine door. Checked that no
     solid prop blocks the path to the `to_mine` zone and that the `from_mine` spawn is not inside anything solid.
 
+- **Step 4.3 — Farm animations**
+  - **Sheet checked first:** `Player/Player_Actions.png` is 96x576 = **48x48 frames, 2 columns x 12 rows** (col 0 =
+    wind-up, col 1 = strike). Rows: 0-2 pickaxe, 3-5 axe, 6-8 hoe (each = side, down, up) and 9-11 watering can in a
+    **different order = down, up, side**. Side frames face right (left = `flipX`). Feet sit on the same line as the
+    32x32 walk frames, so both are drawn with origin (0.5, 0.5) and need no offset.
+  - New `src/systems/toolAnim.js`: `ActionRig` (one per scene) shows the pose on a separate overlay sprite while the
+    physics player is hidden, so the collider / tile lookup / interact zones never move. `rig.busy` **locks movement,
+    Tap A and the menu button** for the whole swing; the HUD prompt hides meanwhile. `TOOLS` table = rows + timing
+    (hoe 170+230 ms, water 200+330 ms, axe 150+220 ms, pickaxe row data ready for Step 4.5).
+  - **Till** = hoe swing, **Water** = watering can pour. The action (soil change, sound, XP, quest) is committed on
+    the **strike frame** (`onImpact`), then control returns after the hold. Facing = last walk direction.
+  - **Plant / Harvest / Feed / Collect:** code-only effects in the same file. The player bends down (squash anchored
+    at the feet, committed at the lowest point), then: plant = soil crumbs + leaf specks + sprout pops up; harvest =
+    leaves + gold sparkles; feed = grain rains on the animal + sparkles (player turns to face the animal);
+    collect egg/milk = sparkles. Particles are tiny generated textures (`fx_spark`, `fx_leaf`, `fx_dot`).
+  - The seed / feed slot is captured when A is pressed (`act.slot`), so changing the hotbar mid-animation cannot
+    consume the wrong item. Bag-full on harvest still shows the deny blip and keeps the crop.
+  - If `player_actions` is missing or placeholder art is used, everything falls back to the old instant action + pulse.
+  - The **axe animation is registered but not used yet** (nothing to chop on the Farm): wire `rig.playTool('axe', ...)`
+    in the Forest chopping step. Pickaxe pose for Step 4.5: `rig.playTool('pickaxe', ...)`.
+  - Files: `public/assets/characters/player_actions.png`, `src/systems/toolAnim.js` (new), `assets.js` (manifest key
+    `player_actions`), `farmArt.js` (`idleFrameFor`), `FarmScene.js`.
+
 ## NEXT
-- **Step 4.3** — Farm animations: hoe, watering can (and axe) from Cute Fantasy `Player/Player_Actions.png`;
-  simple code effects for plant / harvest / feed.
 - **Step 4.4** — Fishing animation (code-drawn: rod pose, line, bobber, splash, jumping fish).
-- **Step 4.5** — Mining: select Pickaxe, face a node, Tap A -> swing animation, shake, 3 hits, drops ore/stone (+XP),
+- **Step 4.5** — Mining: select Pickaxe, face a node, Tap A -> swing animation (`rig.playTool('pickaxe')`), shake, 3 hits, drops ore/stone (+XP),
   node turns to rubble and respawns next day; mined nodes saved (new save schema version).
 - Then: crafting (furnace: ore -> bars), forest foraging/chopping, village house interiors, second quest chain.
 

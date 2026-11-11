@@ -40,6 +40,8 @@ export const ASSET_MANIFEST = {
   soil_dry: { type: 'image', src: 'assets/tiles/soil_dry.png' },
   soil_wet: { type: 'image', src: 'assets/tiles/soil_wet.png' },
   player: { type: 'spritesheet', src: 'assets/characters/player.png', frameWidth: 32, frameHeight: 32 },
+  // Tool / action poses (Step 4.3): 48x48 frames, 2 columns (wind-up, strike), 12 rows. See systems/toolAnim.js.
+  player_actions: { type: 'spritesheet', src: 'assets/characters/player_actions.png', frameWidth: 48, frameHeight: 48 },
 
   // Crop growth stages — Sunnyside World, one 16x16 frame per stage.
   cropsheet_carrot: { type: 'spritesheet', src: 'assets/crops/carrot.png', frameWidth: 16, frameHeight: 16 },
