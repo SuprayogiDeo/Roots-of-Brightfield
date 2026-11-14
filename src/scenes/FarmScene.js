@@ -10,6 +10,8 @@ import { CROPS, isReady, cropFrame, createCropTextures, createBinTexture } from 
 import { createKitchenTexture, addKitchen } from '../systems/crafting.js';
 import { ITEMS, addItem, consumeSlot } from '../systems/items.js';
 import { createWeatherFx } from '../systems/weatherFx.js';
+import { playMusicFor } from '../systems/music.js';
+import { festivalNote } from '../systems/festivals.js';
 import { reportQuest, reportVisit, refreshTracker, flushQueuedQuests } from '../systems/questUi.js';
 import { advanceDay, applyRain, canGrowIn, isWet } from '../systems/calendar.js';
 import { playSfx, SFX_KEYS, createFootsteps } from '../systems/audio.js';
@@ -46,6 +48,7 @@ export default class FarmScene extends Phaser.Scene {
     const save = loadSave();
     if (!save) { this.scene.start('Title'); return; }
     this.save = save;
+    playMusicFor(this, 'farm', save);
     this.gender = save.player.gender;
 
     this.cameras.main.fadeIn(250, 0, 0, 0);
@@ -458,12 +461,15 @@ export default class FarmScene extends Phaser.Scene {
     this.animals.newDay();
     this.hud.refresh();
     playSfx(this, 'jingle_day');
+    playMusicFor(this, 'farm', save); // the season may have changed (winter songs)
 
     const lines = [passedOut ? t('day.passedOut') : t('day.new', { day: save.time.day })];
     if (day.seasonChanged) lines.push(t('season.new', { season: t(`season.${save.time.season}`) }));
     if (day.withered.length) lines.push(t('season.wither', { n: day.withered.length }));
     if (isWet(day.weather)) lines.push(t('weather.rainWater'));
     lines.push(t('weather.forecast', { weather: t(`weather.${day.forecast}`) }));
+    const festNote = festivalNote(save); // "Today is the Morning Market..." / "Tomorrow: ..."
+    if (festNote) lines.push(festNote);
     if (save.time.day === 28) lines.push(t('season.last'));
     this.hud.showMessage(lines.join('\n'));
     if (day.seasonChanged) this.time.delayedCall(5400, () => this.checkQuest('season', { season: save.time.season }));

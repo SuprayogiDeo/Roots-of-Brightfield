@@ -5,6 +5,7 @@ import { makeText, makeButton, addLangToggle, goTo } from '../systems/ui.js';
 import { warmEnabled, setWarm } from '../systems/assets.js';
 import { getUiSize, setUiSize } from '../systems/touchControls.js';
 import { sfxEnabled, setSfx, playSfx } from '../systems/audio.js';
+import { getMusicLevel, setMusicLevel } from '../systems/music.js';
 
 export default class SettingsScene extends Phaser.Scene {
   constructor() {
@@ -76,6 +77,15 @@ export default class SettingsScene extends Phaser.Scene {
       const order = ['s', 'm', 'l'];
       setUiSize(order[(order.indexOf(getUiSize()) + 1) % order.length]);
       sizeBtn.setLabel(sizeLabel());
+      playSfx(this, 'sfx_click');
+    });
+
+    // Music volume row (Off / Low / Medium / High)
+    makeText(this, 40, 226, t('settings.music'), 8, '#F6E7C1', { origin: [0, 0.5] });
+    const musLabel = () => t(`settings.vol.${getMusicLevel()}`);
+    const musBtn = makeButton(this, 380, 226, 90, 18, musLabel(), () => {
+      setMusicLevel((getMusicLevel() + 1) % 4);
+      musBtn.setLabel(musLabel());
       playSfx(this, 'sfx_click');
     });
 

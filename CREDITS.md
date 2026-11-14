@@ -92,6 +92,28 @@ Used for: crop growth stages.
   Unmodified 16x16 cells (nodes trimmed to their pixels). Not used yet: metal bars and swords on the same sheet.
 - Torches and their glow are drawn in code (no art file).
 
+### Kitchen and food icons (Step 4.6b)
+- `public/assets/kitchen/stove.png` — **Cooking & Kitchen Icons Pack** (license: CC0). Author/URL: TODO fill in from the download page.
+- `public/assets/items/sambal.png` — **Pixel Art Food Icons FREE** (soup_1), downscaled to 16x16.
+- `public/assets/items/coffee.png` — **Pixel Art Food Pack** (Cup of coffee), downscaled to 16x16.
+- **Author and license of the last two: NOT VERIFIED** (no license text in the zips). TODO: open the original download
+  pages and fill in author, URL and license before publishing.
+- Still code-drawn placeholders: Salted Egg, Salt, Coffee Beans icons.
+
+### Background music (Step 5.2) — **AUTHOR / SOURCE / LICENSE: NOT VERIFIED (TODO, fill in before publishing)**
+Files in `public/assets/audio/music/` (MP3, 96 kbps stereo, loudness-normalised to about -20 LUFS; converted from the
+WAV files the project owner supplied under the original names):
+| File | Original file | Plays in | Author | Source URL | License |
+|---|---|---|---|---|---|
+| `snow_song.mp3` | `snow_song.wav` | Winter (Farm, Village, Beach, Forest) | TODO | TODO | TODO |
+| `into_the_snow.mp3` | `into_the_snow.wav` | Winter (Farm, Village, Beach, Forest) | TODO | TODO | TODO |
+| `track_5.mp3` | `track_5.wav` | Village, Festival days, Spring/Summer/Fall (2nd song elsewhere) | TODO | TODO | TODO |
+| `track_7.mp3` | `track_7.wav` | Farm, Beach, Forest in Spring/Summer/Fall (2nd song in the Village) | TODO | TODO | TODO |
+- New songs later: add the file + one line in `MUSIC_TRACKS` (`src/systems/music.js`) and one row in this table.
+
+### Festivals and mini-games (Step 5.2)
+- No external art or sound: stalls, bunting and the race / cracker mini-games are drawn in code; sounds reuse the Kenney SFX above.
+
 ### Not used yet (kept out of the repo until needed)
 - The rest of **Sunnyside World** (village, NPCs, UI) — planned for Phase 2.
 - The rest of **Pixel Crawler** (dungeon props, mobs, NPCs, stations such as Furnace/Anvil) — candidates for crafting and NPCs.

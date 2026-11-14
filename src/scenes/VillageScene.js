@@ -11,6 +11,8 @@ import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
 import Dialogue from '../systems/dialogue.js';
 import { NPCS, greet, lineFor } from '../systems/npcs.js';
 import { createWeatherFx } from '../systems/weatherFx.js';
+import { playMusicFor } from '../systems/music.js';
+import { createVillageFestival } from '../systems/festivalVillage.js';
 import { announceQuest, refreshTracker, flushQueuedQuests } from '../systems/questUi.js';
 import { questEvent, offerFor, activeFor, canDeliver, deliver, startQuest } from '../systems/quests.js';
 
@@ -35,6 +37,7 @@ export default class VillageScene extends Phaser.Scene {
     if (!save) { this.scene.start('Title'); return; }
     this.save = save;
     this.gender = save.player.gender;
+    playMusicFor(this, 'village', save);
 
     this.cameras.main.fadeIn(250, 0, 0, 0);
     createFarmTileset(this);
@@ -99,6 +102,8 @@ export default class VillageScene extends Phaser.Scene {
     this.pendingQuest = []; // quest results shown once the dialogue box closes
     refreshTracker(this);
     flushQueuedQuests(this);
+    this.festival = createVillageFestival(this); // null on a normal day
+    if (this.festival) this.festival.welcome();
     this.controls = new TouchControls(this, {
       onA: () => this.pressA(),
       onB: () => this.hud.nextRow()
@@ -142,6 +147,7 @@ export default class VillageScene extends Phaser.Scene {
     if (action === 'to_farm') this.travel('farm');
     else if (action === 'shop') this.openShop();
     else if (action && action.startsWith('npc:')) this.talk(action.slice(4));
+    else if (action && action.startsWith('fest:') && this.festival) this.festival.act(action.slice(5));
   }
 
   talk(id) {
@@ -214,6 +220,7 @@ export default class VillageScene extends Phaser.Scene {
   promptFor(action) {
     if (action === 'to_farm') return t('prompt.toFarm');
     if (action === 'shop') return t('prompt.shop');
+    if (action && action.startsWith('fest:')) return this.festival ? this.festival.prompt(action.slice(5)) : null;
     if (action && action.startsWith('npc:')) {
       const def = NPCS[action.slice(4)];
       return def ? t('prompt.talk', { name: def.name }) : null;

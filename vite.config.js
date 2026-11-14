@@ -31,7 +31,17 @@ export default defineConfig({
       workbox: {
         // json = Tiled maps; png/ogg/mp3 = future real assets -> all available offline
         globPatterns: ['**/*.{js,css,html,json,png,woff,woff2,ogg,mp3}'],
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        // Step 5.2: background music (several MB) is NOT precached; it is cached the first time it plays,
+        // so the first install stays small and the songs still work offline afterwards.
+        globIgnores: ['assets/audio/music/**'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.includes('/assets/audio/music/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'rob-music', cacheableResponse: { statuses: [200] }, expiration: { maxEntries: 16 } }
+          }
+        ]
       }
     })
   ]

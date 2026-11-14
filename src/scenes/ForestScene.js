@@ -10,6 +10,7 @@ import { playSfx, SFX_KEYS, createFootsteps } from '../systems/audio.js';
 import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
 import { createWeatherFx } from '../systems/weatherFx.js';
 import { reportQuest, reportVisit, refreshTracker, flushQueuedQuests } from '../systems/questUi.js';
+import { playMusicFor } from '../systems/music.js';
 
 const CLOCK_STEP_MS = 7000;
 const AUTOSAVE_MS = 30000;
@@ -45,6 +46,7 @@ export default class ForestScene extends Phaser.Scene {
     const save = loadSave();
     if (!save) { this.scene.start('Title'); return; }
     this.save = save;
+    playMusicFor(this, 'forest', save);
     this.gender = save.player.gender;
 
     this.cameras.main.fadeIn(250, 0, 0, 0);

@@ -225,6 +225,7 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
   - Step 4.2 (Mine map + mining) was already in this build (Step 4.5 above) — nothing to redo.
 
 ## NEXT
+- Phase 5 wrap-up: a Winter festival, Mine music, real music credits (author/license), village house interiors.
 - Furnace (ore -> bars) as a 2nd station, forest foraging/chopping (use `rig.playTool('axe', ...)`), village house interiors,
   second quest chain.
 - Mining ideas not done: tool upgrades (more damage = fewer hits), rare double drops, mine level 2 (ladder), energy-free by design.
@@ -243,7 +244,7 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 - NPCs reuse the player sprite with a colour tint (the free pack has no villager sheets) — real
   NPC art can be dropped in via `ASSET_MANIFEST` + one line in `src/systems/npcs.js`.
 - Village houses cannot be entered yet (doors are decoration); only the Seed Shop opens.
-- No background music yet (only short jingles) — planned for Phase 5.
+- Music author / source / license is unverified (TODO table in CREDITS.md).
 - Mobile browsers only start audio after the first tap (normal browser rule).
 - Only ONE character sheet exists in the free pack, so Male and Female look the same for now.
 - Sunnyside World + Pixel Crawler packs are not used yet (planned for Village / Forest / Mine).
@@ -260,9 +261,23 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 - Tuning: DAYS_PER_SEASON, weather weights (`calendar.js`), rewards (`quests.js`), rain volume (`weatherFx.js`).
 - KNOWN ISSUE: `CraftScene.js` is missing from the uploaded zip (Kitchen -> Craft would fail). The cook quest is queued via `questQueue.js` and applied by the next outdoor scene.
 
+## Step 5.2 — Festivals + background music + polish
+- **Festivals** (`systems/festivals.js` pure logic, `systems/festivalVillage.js` village decor/spots, `scenes/FestivalGameScene.js`). All in the Village, one per season (Winter has none yet):
+  - **Morning Market** — Spring 14, 06:00-12:00: sell everything at +25% (unlimited), "morning bargain" = 5 Animal Feed for 15g (once).
+  - **Independence Day Games** — Summer 17, 09:00-17:00: **Sack Race** (tap fast vs Rangga, Ayu, Mina) and **Cracker Eating** (tap in the green zone, 6 bites). Prizes 200/120/60/20g + XP; each game once per festival day; each takes 30 in-game minutes. Quitting early = no prize, no try used.
+  - **Harvest Festival** — Fall 21, 10:00-18:00: **Harvest Contest** (your most valuable sellable item is entered and kept: 100g+ item = 500g, 40g+ = 250g, else 100g) and **Feast** (+2 friendship with every villager, once).
+  - Red/white (or festival-coloured) bunting + two solid stalls drawn in code; a welcome message once per festival day; the "new day" message announces "Today / Tomorrow: ...".
+  - No save-schema change: `save.festival {day, done, seen}` is created on demand and resets each day. The `FestGame` scene registers itself from `festivalVillage.js` (main.js unchanged).
+- **Music** (`systems/music.js`): streamed MP3 (low RAM), crossfade, shared across scenes, pauses when the app is hidden, volume Off/Low/Medium/High in Settings (`rob_music`). Rules (first match wins): festival (Village) -> track_5; Mine -> silent; Winter -> snow_song + into_the_snow; Village -> track_5, track_7; everything else -> track_7, track_5. Rain/storm lowers the volume. **To add songs: put the .mp3 in `public/assets/audio/music/`, add one line to `MUSIC_TRACKS`, add its key to a rule in `MUSIC_RULES`.**
+- PWA: music is not precached (first install stays small); it is cached the first time it plays (works offline afterwards). Settings gets a Music row.
+- Tests: festival logic + music rules + syntax of every changed file checked in node. NOT run in a browser (no Phaser/Vite available in this session) — please test on the phone.
+- Tuning: stall spots (`SPOT_X`, `STALL_Y`), prizes (`GAME_PRIZES`, `contestResult`), rival speeds (`rate` in `buildSack`), cracker zone/speed (`buildKrupuk`), volumes (`LEVELS`), per-song `volume` and `MUSIC_RULES` (`music.js`).
+
 ## DECISIONS
 - Item, crop, place and NPC names stay English in both languages; only UI text / dialogue is translated.
 - Selling happens at the Shipping Bin next to the field until the Village shop exists.
 - Crops only grow on the dirt field tiles (the brown patch east of the shed).
 - Mine ores (Step 4.2): Stone, Copper Ore, Gold Ore, Aquamarine, Ruby, Emerald, Amethyst (no iron/coal: the pack has none).
 - Prop asset keys must be unique across Beach/Forest/Mine (`prop_<name>`): Mine rock is `mine_rock_big`.
+- Festival names stay English in both languages; game names and all texts are translated (EN + ID).
+- Festival days never block normal play: Farm, Beach, Forest and Mine work as usual.

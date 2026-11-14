@@ -1,7 +1,9 @@
 import en from './en.json';
 import id from './id.json';
+import enFestival from './festival.en.json'; // Step 5.2 (festivals, mini-games, music setting)
+import idFestival from './festival.id.json';
 
-const DICT = { en, id };
+const DICT = { en: { ...en, ...enFestival }, id: { ...id, ...idFestival } };
 const LS_KEY = 'rob_lang';
 
 function detect() {

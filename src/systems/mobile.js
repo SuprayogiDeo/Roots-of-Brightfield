@@ -1,3 +1,5 @@
+import { pauseMusic, resumeMusic } from './music.js';
+
 // Mobile guards (no zoom, no callout, no scroll) + app lifecycle.
 
 export function setupMobileGuards() {
@@ -15,6 +17,7 @@ export function setupMobileGuards() {
 // Pause the Farm when the app is hidden (FarmScene autosaves on pause).
 export function setupLifecycle(game) {
   document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseMusic(); else resumeMusic(); // music follows the app, in every scene
     const farm = game.scene.getScene('Farm');
     if (!farm || !farm.sys.isActive() && !farm.sys.isPaused()) return;
     if (document.hidden) farm.scene.pause();

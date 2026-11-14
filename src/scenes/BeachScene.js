@@ -13,6 +13,7 @@ import { reportQuest, reportVisit, refreshTracker, flushQueuedQuests } from '../
 import { ITEMS, addItem } from '../systems/items.js';
 import { addXp, XP_GAIN } from '../systems/xp.js';
 import FishingGame, { fishName } from '../systems/fishing.js';
+import { playMusicFor } from '../systems/music.js';
 
 const CLOCK_STEP_MS = 7000;
 const AUTOSAVE_MS = 30000;
@@ -49,6 +50,7 @@ export default class BeachScene extends Phaser.Scene {
     const save = loadSave();
     if (!save) { this.scene.start('Title'); return; }
     this.save = save;
+    playMusicFor(this, 'beach', save);
     this.gender = save.player.gender;
 
     this.cameras.main.fadeIn(250, 0, 0, 0);

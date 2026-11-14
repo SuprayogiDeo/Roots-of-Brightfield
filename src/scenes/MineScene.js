@@ -15,6 +15,7 @@ import {
   NODE_DEFS, HITS_TO_BREAK, canFit, isMinedOut, markMinedOut, respawnNodes, footprint, findTarget
 } from '../systems/mining.js';
 import { hitFx, breakFx, oreJump } from '../systems/miningFx.js';
+import { playMusicFor } from '../systems/music.js';
 
 const CLOCK_STEP_MS = 7000;
 const AUTOSAVE_MS = 30000;
@@ -51,6 +52,7 @@ export default class MineScene extends Phaser.Scene {
     const save = loadSave();
     if (!save) { this.scene.start('Title'); return; }
     this.save = save;
+    playMusicFor(this, 'mine', save);
     this.gender = save.player.gender;
 
     this.cameras.main.fadeIn(250, 0, 0, 0);
