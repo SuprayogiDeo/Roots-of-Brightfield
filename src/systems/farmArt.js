@@ -68,6 +68,47 @@ export function idleFrameFor(dir) {
   return REAL_ROW.idle[d] * 6;
 }
 
+// --- Cozy Lands player (Step A1): 48x48 frames, 4 cols x 8 rows (rows come in identical pairs) -----
+// rows: up 0 · down 2 · left 4 · right 6. Sprite origin is shifted so the feet sit on the physics body.
+const COZY_ROW = { up: 0, down: 2, left: 4, right: 6 };
+export const COZY_ORIGIN_Y = 21 / 48; // sprite.y = 21 px below the frame top; feet line = sprite.y + 10
+export const COZY_FEET_ORIGIN_Y = 31 / 48; // for overlays positioned at feet (sprite.y + 10)
+
+// 'cl_girl' / 'cl_boy' when both sheets are loaded, else null (-> old sprite).
+export function cozyPrefix(scene, gender) {
+  const p = gender === 'female' ? 'cl_girl' : 'cl_boy';
+  return scene.textures.exists(`${p}_idle`) && scene.textures.exists(`${p}_walk`) ? p : null;
+}
+
+export function cozyIdleFrame(dir) {
+  return COZY_ROW[dir] * 4;
+}
+
+function createCozyAnims(scene, p) {
+  ['idle', 'walk'].forEach((kind) => {
+    Object.keys(COZY_ROW).forEach((d) => {
+      const key = `${p}_${kind}_${d}`;
+      if (scene.anims.exists(key)) return;
+      const r = COZY_ROW[d] * 4;
+      scene.anims.create({
+        key,
+        frames: scene.anims.generateFrameNumbers(`${p}_${kind}`, { start: r, end: r + 3 }),
+        frameRate: kind === 'walk' ? 8 : 4,
+        repeat: -1
+      });
+    });
+  });
+}
+
+// Feet-sized collider (10x5, centre 7.5 px below sprite.y = same spot as the old 32x32 sprite,
+// so spawn points, interact zones and tile lookups are unchanged).
+function applyCozyBody(sprite, p) {
+  sprite.setTexture(`${p}_idle`, COZY_ROW.down * 4);
+  sprite.setOrigin(0.5, COZY_ORIGIN_Y);
+  if (sprite.body) sprite.body.setSize(10, 5).setOffset(19, 26);
+  sprite.setData('clBody', p);
+}
+
 export function usingRealPlayer(scene) {
   return scene.textures.exists('player');
 }
@@ -90,6 +131,13 @@ function createRealPlayerAnims(scene) {
 
 // One API for both placeholder and real art.
 export function setPlayerDir(scene, sprite, gender, dir, moving) {
+  const cp = cozyPrefix(scene, gender);
+  if (cp) {
+    if (sprite.getData('clBody') !== cp) applyCozyBody(sprite, cp);
+    sprite.setFlipX(false); // left and right have their own rows
+    sprite.play(`${cp}_${moving ? 'walk' : 'idle'}_${dir}`, true);
+    return;
+  }
   if (usingRealPlayer(scene)) {
     const d = dir === 'up' || dir === 'down' ? dir : 'side';
     sprite.setFlipX(dir === 'left');
@@ -101,6 +149,8 @@ export function setPlayerDir(scene, sprite, gender, dir, moving) {
 }
 
 export function createPlayerTextures(scene, gender) {
+  const cp = cozyPrefix(scene, gender);
+  if (cp) createCozyAnims(scene, cp); // old textures/anims below are still built as the fallback
   if (usingRealPlayer(scene)) { createRealPlayerAnims(scene); return; }
   ['down', 'up', 'left', 'right'].forEach((dir) => {
     [0, 1].forEach((frame) => {

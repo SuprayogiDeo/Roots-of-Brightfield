@@ -1,4 +1,4 @@
-import { usingRealPlayer, idleFrameFor, setPlayerDir } from './farmArt.js';
+import { usingRealPlayer, idleFrameFor, setPlayerDir, cozyPrefix, cozyIdleFrame } from './farmArt.js';
 
 // ---------------------------------------------------------------------------
 // FISHING POSE (Step 4.4, part 1) — no new art.
@@ -11,6 +11,8 @@ import { usingRealPlayer, idleFrameFor, setPlayerDir } from './farmArt.js';
 // Hand position relative to the 32x32 walk sprite's centre, and the wanted rod angle
 // (degrees, 0 = right, +90 = down) for each facing.
 const HAND = { right: [5, 1], left: [-5, 1], down: [5, 2], up: [5, 0] };
+// Cozy Lands sprite: hands are lower (sprite.y sits 21 px below the frame top).
+const HAND_COZY = { right: [6, 5], left: [-6, 5], down: [6, 6], up: [6, 3] };
 const AIM = { right: -30, left: -150, down: 55, up: -65 };
 // In the 16x16 icon: handle (2, 12.5) -> tip (14.5, 1.5).
 const ORIGIN = [2 / 16, 12.5 / 16];
@@ -35,7 +37,8 @@ export default class RodPose {
     this.offset = 0; // extra rod angle in degrees (negative = back-swing / yank up)
     this.on = false;
     this.token = 0;
-    this.real = usingRealPlayer(scene) && scene.textures.exists('item_fishing_rod');
+    this.cp = cozyPrefix(scene, scene.gender);
+    this.real = (usingRealPlayer(scene) || !!this.cp) && scene.textures.exists('item_fishing_rod');
     if (this.real) {
       makeHeldRod(scene);
       this.sprite = scene.add.image(0, 0, 'rod_held').setOrigin(ORIGIN[0], ORIGIN[1]).setVisible(false);
@@ -49,15 +52,20 @@ export default class RodPose {
     this.on = true;
     if (!this.real) return;
     this.player.anims.stop();
-    this.player.setFlipX(facing === 'left');
-    this.player.setFrame(idleFrameFor(facing));
+    if (this.cp) {
+      this.player.setFlipX(false);
+      this.player.setTexture(`${this.cp}_idle`, cozyIdleFrame(facing));
+    } else {
+      this.player.setFlipX(facing === 'left');
+      this.player.setFrame(idleFrameFor(facing));
+    }
     this.sprite.setVisible(true);
     this.place();
   }
 
   place() {
     if (!this.real || !this.on) return;
-    const [hx, hy] = HAND[this.facing];
+    const [hx, hy] = (this.cp ? HAND_COZY : HAND)[this.facing];
     const sx = this.facing === 'left' ? -1 : 1;
     const dir = this.facing === 'left' ? -1 : 1;
     const base = Math.atan2(TIP[1], TIP[0] * sx);

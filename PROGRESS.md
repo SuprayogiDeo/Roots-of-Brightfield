@@ -273,6 +273,25 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 - Tests: festival logic + music rules + syntax of every changed file checked in node. NOT run in a browser (no Phaser/Vite available in this session) — please test on the phone.
 - Tuning: stall spots (`SPOT_X`, `STALL_Y`), prizes (`GAME_PRIZES`, `contestResult`), rival speeds (`rate` in `buildSack`), cracker zone/speed (`buildKrupuk`), volumes (`LEVELS`), per-song `volume` and `MUSIC_RULES` (`music.js`).
 
+## Step A0 — Asset inventory and style test (new art direction)
+- No code or game asset changed. Analysis in `ASSET_INVENTORY.md` + `style_test.png`.
+- Direction: terrain/houses/trees/tool icons from **Cozy Lands Basic** (Amo-QAQ); everything alive and UI (player, NPCs, animals, crops, buildings, props, machines, effects, UI) from **Farm & Ranch Life (pack 6)**. Clover Valley Free and Garden Planters are not used.
+- License: Cozy Lands FREE is non-commercial (premium US$2.99+ for commercial); pack 6 allows commercial.
+- Open decisions: corn/tomato substitutes (recolor or change crop list); sand, mine floor, cliffs by recolor.
+- NEXT: Step A1 (player + NPC sprites from pack 6).
+
+## Step A1 — Player sprites from Cozy Lands
+- Male = Cozy `boy`, Female = Cozy `girl` (CharacterSelect unchanged). Walk + idle in 4 directions (left/right are real rows, no flip). Sheets: 48x48 frames, rows up 0 / down 2 / left 4 / right 6 (rows come in identical pairs; water = 3 rows per direction).
+- Girl actions: hoe (till), water, chop (axe), mine (pickaxe) from her own sheets; impact fires on frame 2 of each swing. Plant/harvest/feed = idle frame + squash (same as before).
+- Boy actions (no art in the pack): idle pose + lean back, lunge forward, code-drawn tool glyph (hoe/axe/pickaxe/can) swings. Pack 6 male actions were NOT used: its 16x32 humans do not match Cozy's chibi (~18x22) and would pop in the middle of an action. Same timing as the girl.
+- Hitbox unchanged in the world: 10x5 box, centre 7.5 px below sprite.y (spawn points, interact zones, `tileUnderPlayer` all identical). Sprite origin y = 21/48 so the feet sit on the box; overlays (tool pose, crouch) use the same origin. Fishing rod hand positions have a Cozy table (`HAND_COZY`).
+- Fallback: if a `cl_*` sheet fails to load, `cozyPrefix()` returns null and everything runs on the old Cute Fantasy sprite / code placeholder.
+- Loading: `preloadAssets` adds the 8 Cozy keys whenever a scene asks for `player` (no scene edits).
+- Checks run: syntax of changed files; `vite build` OK (8 Cozy PNGs in dist); pixel-level BFS with the 10x5 box on `farm.json` + `village.json`: every Interact zone (shed, sign, bin, to_village/beach/forest, shop, to_farm, 3 NPCs) and every Points entry is reachable, so no 1-tile door traps it. NOT run in a browser/phone — please test.
+- Not changed: NPCs (still tinted Cute Fantasy), dialogue portrait, festival sack-race runner (still old sprite) -> A1b.
+- Tuning: `COZY_ORIGIN_Y`, `applyCozyBody` (size/offset) in `farmArt.js`; `HAND_COZY` in `fishingPose.js`; boy glyph hand/angles + `girlSeq` timings in `toolAnim.js`.
+- NEXT: Step A2 (crops/items) or A1b (NPC/portrait to match).
+
 ## DECISIONS
 - Item, crop, place and NPC names stay English in both languages; only UI text / dialogue is translated.
 - Selling happens at the Shipping Bin next to the field until the Village shop exists.

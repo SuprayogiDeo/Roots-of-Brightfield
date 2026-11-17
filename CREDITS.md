@@ -114,6 +114,13 @@ WAV files the project owner supplied under the original names):
 ### Festivals and mini-games (Step 5.2)
 - No external art or sound: stalls, bunting and the race / cracker mini-games are drawn in code; sounds reuse the Kenney SFX above.
 
+### Player sprites (Step A1) — Cozy Lands (Basic pack) by **Amo-QAQ** (amo-qaq.itch.io)
+- Files: `public/assets/characters/cozy/` = `boy_idle/walk`, `girl_idle/walk/hoe/chop/mine/water` (unmodified copies of the pack's `Characters/boy` and `Characters/girl` sheets, 48x48 frames).
+- **License: FREE version = NON-COMMERCIAL use only.** Modifying is allowed; no NFTs, no AI training; do not resell/redistribute the pack itself. Commercial use needs the PREMIUM version (US$2.99+) — **buy it (or switch art) BEFORE any paid/monetised release.**
+- Credit: Amo-QAQ. If published on itch.io, link back to the pack.
+- The boy's tool actions are code-drawn (his idle pose + lean/lunge + small tool glyphs); no Cozy art exists for them.
+- The old Cute Fantasy `player.png` / `player_actions.png` stay as fallback (and as NPC/portrait art).
+
 ### Not used yet (kept out of the repo until needed)
 - The rest of **Sunnyside World** (village, NPCs, UI) — planned for Phase 2.
 - The rest of **Pixel Crawler** (dungeon props, mobs, NPCs, stations such as Furnace/Anvil) — candidates for crafting and NPCs.

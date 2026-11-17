@@ -30,6 +30,12 @@ export const FISH_IDS = [
   'fish_sardine', 'fish_mackerel', 'fish_bass', 'fish_catfish', 'fish_snapper', 'fish_golden_carp'
 ];
 
+// Cozy Lands player sheets: cl_<girl|boy>_<action>. Boy only has idle + walk.
+export const COZY_KEYS = [
+  'cl_girl_idle', 'cl_girl_walk', 'cl_girl_hoe', 'cl_girl_chop', 'cl_girl_mine', 'cl_girl_water',
+  'cl_boy_idle', 'cl_boy_walk'
+];
+
 export const ASSET_MANIFEST = {
   // Tiled map (real file). Tile ids inside it match the tileset below.
   map_farm: { type: 'tilemap', src: 'assets/maps/farm.json' },
@@ -40,6 +46,9 @@ export const ASSET_MANIFEST = {
   soil_dry: { type: 'image', src: 'assets/tiles/soil_dry.png' },
   soil_wet: { type: 'image', src: 'assets/tiles/soil_wet.png' },
   player: { type: 'spritesheet', src: 'assets/characters/player.png', frameWidth: 32, frameHeight: 32 },
+  // Player — Cozy Lands (Basic pack): 48x48 frames, 4 cols; rows up=0 down=2 left=4 right=6 (water: 3 rows/dir).
+  // Missing files -> falls back to the Cute Fantasy `player` sheet (see farmArt.js).
+  ...Object.fromEntries(COZY_KEYS.map((k) => [k, { type: 'spritesheet', src: `assets/characters/cozy/${k.slice(3)}.png`, frameWidth: 48, frameHeight: 48 }])),
   // Tool / action poses (Step 4.3): 48x48 frames, 2 columns (wind-up, strike), 12 rows. See systems/toolAnim.js.
   player_actions: { type: 'spritesheet', src: 'assets/characters/player_actions.png', frameWidth: 48, frameHeight: 48 },
 
@@ -113,6 +122,7 @@ export function hasRealAsset(key) {
 // Queue the real files for the given keys (call from a scene's preload()).
 // Keys without a manifest entry are skipped -> the scene draws a placeholder.
 export function preloadAssets(scene, keys) {
+  if (keys.includes('player')) keys = [...keys, ...COZY_KEYS]; // every scene with a player also needs the Cozy sheets
   keys.forEach((key) => {
     const a = ASSET_MANIFEST[key];
     if (!a || scene.textures.exists(key) || scene.cache.tilemap.exists(key)

@@ -1,4 +1,4 @@
-import { usingRealPlayer, idleFrameFor } from './farmArt.js';
+import { usingRealPlayer, idleFrameFor, cozyPrefix, cozyIdleFrame, COZY_ORIGIN_Y, COZY_FEET_ORIGIN_Y } from './farmArt.js';
 
 // ---------------------------------------------------------------------------
 // TOOL ANIMATIONS + SIMPLE CODE EFFECTS (Step 4.3)
@@ -28,7 +28,44 @@ const WALK_FEET_DY = 9; // feet are 9 px below the walk sprite's centre
 
 const sideOf = (dir) => (dir === 'up' || dir === 'down' ? dir : 'side');
 
+// --- Cozy Lands (Step A1) -----------------------------------------------------
+// Girl: real sheets cl_girl_<hoe|chop|mine|water> (4 cols x 8 rows, rows up 0 / down 2 / left 4 / right 6;
+//       water = 3 rows per direction: up 0, down 3, left 6, right 9).
+// Boy : only idle/walk exist, so he gets a code pose: idle frame + lean/lunge + a small tool glyph swinging.
+const COZY_SHEET = { hoe: 'hoe', axe: 'chop', pickaxe: 'mine' };
+const COZY_ROWS = { up: 0, down: 2, left: 4, right: 6 };
+const WATER_ROWS = { up: 0, down: 3, left: 6, right: 9 };
+const VEC = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+
+// [texture suffix, frame, ms, impact?] — the first entry is shown immediately by begin().
+function girlSeq(tool, facing) {
+  if (tool === 'water') {
+    const b = WATER_ROWS[facing] * 4;
+    return [[ 'water', b, 120 ], [ 'water', b + 4, 90, true ], [ 'water', b + 5, 110 ], [ 'water', b + 6, 110 ], [ 'water', b + 7, 110 ], [ 'water', b + 8, 100 ]];
+  }
+  const k = COZY_SHEET[tool];
+  const r = COZY_ROWS[facing] * 4;
+  return [[ k, r, 120 ], [ k, r + 1, 90, true ], [ k, r + 2, 90 ], [ k, r + 3, 110 ]];
+}
+
+function createToolGlyphs(scene) {
+  if (scene.textures.exists('fx_tool_hoe')) return;
+  const make = (key, draw) => {
+    const g = scene.make.graphics({ add: false });
+    for (let i = 0; i < 9; i++) { g.fillStyle(0x8a5a33, 1); g.fillRect(1 + i, 10 - i, 1, 1); } // handle
+    draw(g);
+    g.generateTexture(key, 12, 12);
+    g.destroy();
+  };
+  const steel = 0xc9ccd4;
+  make('fx_tool_hoe', (g) => { g.fillStyle(steel, 1); g.fillRect(8, 0, 4, 2); g.fillRect(10, 2, 2, 2); });
+  make('fx_tool_axe', (g) => { g.fillStyle(steel, 1); g.fillRect(7, 0, 5, 4); });
+  make('fx_tool_pickaxe', (g) => { g.fillStyle(steel, 1); g.fillRect(5, 0, 7, 2); g.fillRect(5, 2, 1, 2); g.fillRect(11, 2, 1, 2); });
+  make('fx_tool_water', (g) => { g.fillStyle(0x7b8ea6, 1); g.fillRect(4, 3, 7, 6); g.fillStyle(0x9fb2c9, 1); g.fillRect(1, 2, 3, 1); g.fillRect(4, 3, 7, 1); });
+}
+
 export function createFxTextures(scene) {
+  createToolGlyphs(scene);
   if (scene.textures.exists('fx_spark')) return;
   const g = scene.make.graphics({ add: false });
   g.fillStyle(0xffffff, 1);
@@ -53,8 +90,10 @@ export default class ActionRig {
     this.scene = scene;
     this.player = player;
     this.busy = false;
-    this.ready = usingRealPlayer(scene) && scene.textures.exists('player_actions');
-    this.sprite = scene.add.sprite(player.x, player.y, 'player', 0).setVisible(false);
+    this.cp = cozyPrefix(scene, scene.gender); // Cozy Lands sprite for this gender, or null (old sprite)
+    this.ready = !!this.cp || (usingRealPlayer(scene) && scene.textures.exists('player_actions'));
+    this.sprite = scene.add.sprite(player.x, player.y, this.cp ? `${this.cp}_idle` : 'player', 0).setVisible(false);
+    this.glyph = null;
     createFxTextures(scene);
   }
 
@@ -63,6 +102,7 @@ export default class ActionRig {
     const def = TOOLS[tool];
     if (this.busy) return;
     if (!this.ready || !def) { if (onImpact) onImpact(); if (onDone) onDone(); return; }
+    if (this.cp) { this.playCozyTool(tool, def, facing, { onImpact, onDone }); return; }
     const row = def.rows[sideOf(facing)];
     this.begin('player_actions', row * 2, facing, 0.5, 0);
     this.after(def.windup, () => {
@@ -72,11 +112,46 @@ export default class ActionRig {
     this.after(def.windup + def.hold, () => this.end(facing, onDone));
   }
 
+  playCozyTool(tool, def, facing, { onImpact, onDone }) {
+    if (this.cp === 'cl_girl') {
+      const seq = girlSeq(tool, facing);
+      this.begin(`cl_girl_${seq[0][0]}`, seq[0][1], facing, COZY_ORIGIN_Y, 0, false);
+      let t = seq[0][2];
+      seq.slice(1).forEach(([k, f, ms, hit]) => {
+        this.after(t, () => {
+          this.sprite.setTexture(`cl_girl_${k}`, f);
+          if (hit && onImpact) onImpact();
+        });
+        t += ms;
+      });
+      this.after(t, () => this.end(facing, onDone));
+      return;
+    }
+    // boy: idle pose + lean back, then lunge forward with the tool glyph swinging down
+    const [vx, vy] = VEC[facing];
+    this.begin('cl_boy_idle', cozyIdleFrame(facing), facing, COZY_ORIGIN_Y, 0, false);
+    if (!this.glyph) this.glyph = this.scene.add.image(0, 0, 'fx_tool_hoe').setOrigin(0.1, 0.9).setVisible(false);
+    const g = this.glyph;
+    const hand = { x: this.player.x + vx * 7 + (vx === 0 ? 5 : 0), y: this.player.y + 3 + vy * 5 };
+    const flip = facing === 'left' ? -1 : 1;
+    g.setTexture(`fx_tool_${tool === 'axe' ? 'axe' : tool}`).setScale(flip, 1)
+      .setPosition(hand.x, hand.y).setAngle(flip * -55)
+      .setDepth(this.player.depth + (facing === 'up' ? -0.5 : 0.5)).setVisible(true);
+    this.sprite.setPosition(this.player.x - vx, this.player.y - vy);
+    this.after(def.windup, () => {
+      this.scene.tweens.add({ targets: this.sprite, x: this.player.x + vx * 3, y: this.player.y + vy * 3, duration: 70 });
+      this.scene.tweens.add({ targets: g, angle: flip * 50, x: hand.x + vx * 3, y: hand.y + vy * 3, duration: 90, ease: 'Quad.easeIn' });
+      this.after(80, () => { if (onImpact) onImpact(); });
+    });
+    this.after(def.windup + def.hold, () => this.end(facing, onDone));
+  }
+
   // Bend down and pop back up (plant / harvest / feed). Squash is anchored at the feet.
   playCrouch(facing, { onImpact, onDone } = {}) {
     if (this.busy) return;
     if (!this.ready) { if (onImpact) onImpact(); if (onDone) onDone(); return; }
-    this.begin('player', idleFrameFor(facing), facing, WALK_FEET_ORIGIN_Y, WALK_FEET_DY);
+    if (this.cp) this.begin(`${this.cp}_idle`, cozyIdleFrame(facing), facing, COZY_FEET_ORIGIN_Y, 10, false);
+    else this.begin('player', idleFrameFor(facing), facing, WALK_FEET_ORIGIN_Y, WALK_FEET_DY);
     this.scene.tweens.add({
       targets: this.sprite,
       scaleY: 0.78,
@@ -89,7 +164,7 @@ export default class ActionRig {
     this.after(300, () => this.end(facing, onDone));
   }
 
-  begin(texture, frame, facing, originY, dy) {
+  begin(texture, frame, facing, originY, dy, flip = facing === 'left') {
     const p = this.player;
     this.busy = true;
     p.setVelocity(0, 0);
@@ -98,7 +173,7 @@ export default class ActionRig {
     this.sprite.setTexture(texture, frame)
       .setOrigin(0.5, originY)
       .setScale(1)
-      .setFlipX(facing === 'left')
+      .setFlipX(flip)
       .setPosition(p.x, p.y + dy)
       .setDepth(p.depth)
       .setVisible(true);
@@ -106,6 +181,7 @@ export default class ActionRig {
 
   end(facing, onDone) {
     this.sprite.setVisible(false).setScale(1);
+    if (this.glyph) this.glyph.setVisible(false);
     this.player.setVisible(true);
     this.busy = false;
     if (onDone) onDone(facing);
