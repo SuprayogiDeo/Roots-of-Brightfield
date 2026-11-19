@@ -225,7 +225,6 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
   - Step 4.2 (Mine map + mining) was already in this build (Step 4.5 above) — nothing to redo.
 
 ## NEXT
-- Phase 5 wrap-up: a Winter festival, Mine music, real music credits (author/license), village house interiors.
 - Furnace (ore -> bars) as a 2nd station, forest foraging/chopping (use `rig.playTool('axe', ...)`), village house interiors,
   second quest chain.
 - Mining ideas not done: tool upgrades (more damage = fewer hits), rare double drops, mine level 2 (ladder), energy-free by design.
@@ -244,7 +243,7 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 - NPCs reuse the player sprite with a colour tint (the free pack has no villager sheets) — real
   NPC art can be dropped in via `ASSET_MANIFEST` + one line in `src/systems/npcs.js`.
 - Village houses cannot be entered yet (doors are decoration); only the Seed Shop opens.
-- Music author / source / license is unverified (TODO table in CREDITS.md).
+- No background music yet (only short jingles) — planned for Phase 5.
 - Mobile browsers only start audio after the first tap (normal browser rule).
 - Only ONE character sheet exists in the free pack, so Male and Female look the same for now.
 - Sunnyside World + Pixel Crawler packs are not used yet (planned for Village / Forest / Mine).
@@ -261,36 +260,23 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 - Tuning: DAYS_PER_SEASON, weather weights (`calendar.js`), rewards (`quests.js`), rain volume (`weatherFx.js`).
 - KNOWN ISSUE: `CraftScene.js` is missing from the uploaded zip (Kitchen -> Craft would fail). The cook quest is queued via `questQueue.js` and applied by the next outdoor scene.
 
-## Step 5.2 — Festivals + background music + polish
-- **Festivals** (`systems/festivals.js` pure logic, `systems/festivalVillage.js` village decor/spots, `scenes/FestivalGameScene.js`). All in the Village, one per season (Winter has none yet):
-  - **Morning Market** — Spring 14, 06:00-12:00: sell everything at +25% (unlimited), "morning bargain" = 5 Animal Feed for 15g (once).
-  - **Independence Day Games** — Summer 17, 09:00-17:00: **Sack Race** (tap fast vs Rangga, Ayu, Mina) and **Cracker Eating** (tap in the green zone, 6 bites). Prizes 200/120/60/20g + XP; each game once per festival day; each takes 30 in-game minutes. Quitting early = no prize, no try used.
-  - **Harvest Festival** — Fall 21, 10:00-18:00: **Harvest Contest** (your most valuable sellable item is entered and kept: 100g+ item = 500g, 40g+ = 250g, else 100g) and **Feast** (+2 friendship with every villager, once).
-  - Red/white (or festival-coloured) bunting + two solid stalls drawn in code; a welcome message once per festival day; the "new day" message announces "Today / Tomorrow: ...".
-  - No save-schema change: `save.festival {day, done, seen}` is created on demand and resets each day. The `FestGame` scene registers itself from `festivalVillage.js` (main.js unchanged).
-- **Music** (`systems/music.js`): streamed MP3 (low RAM), crossfade, shared across scenes, pauses when the app is hidden, volume Off/Low/Medium/High in Settings (`rob_music`). Rules (first match wins): festival (Village) -> track_5; Mine -> silent; Winter -> snow_song + into_the_snow; Village -> track_5, track_7; everything else -> track_7, track_5. Rain/storm lowers the volume. **To add songs: put the .mp3 in `public/assets/audio/music/`, add one line to `MUSIC_TRACKS`, add its key to a rule in `MUSIC_RULES`.**
-- PWA: music is not precached (first install stays small); it is cached the first time it plays (works offline afterwards). Settings gets a Music row.
-- Tests: festival logic + music rules + syntax of every changed file checked in node. NOT run in a browser (no Phaser/Vite available in this session) — please test on the phone.
-- Tuning: stall spots (`SPOT_X`, `STALL_Y`), prizes (`GAME_PRIZES`, `contestResult`), rival speeds (`rate` in `buildSack`), cracker zone/speed (`buildKrupuk`), volumes (`LEVELS`), per-song `volume` and `MUSIC_RULES` (`music.js`).
-
 ## Step A0 — Asset inventory and style test (new art direction)
-- No code or game asset changed. Analysis in `ASSET_INVENTORY.md` + `style_test.png`.
+- No code or game asset changed in this step. Analysis lives in `ASSET_INVENTORY.md`.
 - Direction: terrain/houses/trees/tool icons from **Cozy Lands Basic** (Amo-QAQ); everything alive and UI (player, NPCs, animals, crops, buildings, props, machines, effects, UI) from **Farm & Ranch Life (pack 6)**. Clover Valley Free and Garden Planters are not used.
 - License: Cozy Lands FREE is non-commercial (premium US$2.99+ for commercial); pack 6 allows commercial.
-- Open decisions: corn/tomato substitutes (recolor or change crop list); sand, mine floor, cliffs by recolor.
+- Open decisions: corn/tomato substitutes (recolor, or change the crop list); sand, mine floor and cliffs by recolor.
+- Step 5.2 (festivals + music) is delivered as a separate package; not yet confirmed tested on the phone.
 - NEXT: Step A1 (player + NPC sprites from pack 6).
 
-## Step A1 — Player sprites from Cozy Lands
-- Male = Cozy `boy`, Female = Cozy `girl` (CharacterSelect unchanged). Walk + idle in 4 directions (left/right are real rows, no flip). Sheets: 48x48 frames, rows up 0 / down 2 / left 4 / right 6 (rows come in identical pairs; water = 3 rows per direction).
-- Girl actions: hoe (till), water, chop (axe), mine (pickaxe) from her own sheets; impact fires on frame 2 of each swing. Plant/harvest/feed = idle frame + squash (same as before).
-- Boy actions (no art in the pack): idle pose + lean back, lunge forward, code-drawn tool glyph (hoe/axe/pickaxe/can) swings. Pack 6 male actions were NOT used: its 16x32 humans do not match Cozy's chibi (~18x22) and would pop in the middle of an action. Same timing as the girl.
-- Hitbox unchanged in the world: 10x5 box, centre 7.5 px below sprite.y (spawn points, interact zones, `tileUnderPlayer` all identical). Sprite origin y = 21/48 so the feet sit on the box; overlays (tool pose, crouch) use the same origin. Fishing rod hand positions have a Cozy table (`HAND_COZY`).
-- Fallback: if a `cl_*` sheet fails to load, `cozyPrefix()` returns null and everything runs on the old Cute Fantasy sprite / code placeholder.
-- Loading: `preloadAssets` adds the 8 Cozy keys whenever a scene asks for `player` (no scene edits).
-- Checks run: syntax of changed files; `vite build` OK (8 Cozy PNGs in dist); pixel-level BFS with the 10x5 box on `farm.json` + `village.json`: every Interact zone (shed, sign, bin, to_village/beach/forest, shop, to_farm, 3 NPCs) and every Points entry is reachable, so no 1-tile door traps it. NOT run in a browser/phone — please test.
-- Not changed: NPCs (still tinted Cute Fantasy), dialogue portrait, festival sack-race runner (still old sprite) -> A1b.
-- Tuning: `COZY_ORIGIN_Y`, `applyCozyBody` (size/offset) in `farmArt.js`; `HAND_COZY` in `fishingPose.js`; boy glyph hand/angles + `girlSeq` timings in `toolAnim.js`.
-- NEXT: Step A2 (crops/items) or A1b (NPC/portrait to match).
+## Step A1 — Player and villagers from Farm & Ranch Life (pack 6)
+- Replaced the player art (male + female) and the 3 villagers; no change to movement, hitbox, zones or tool logic: the converted sheets keep the game's existing layouts.
+- Files (all in `public/assets/characters/`, produced by `tools/convert_pack6_characters.py`, which you do NOT need to run): `player.png` (male) / `player_f.png` (female) = 192x128, 32x32 cells, rows down/up/right (left = flipX), cols 0-3 walk, 4-5 idle; `player_actions.png` / `player_actions_f.png` = 96x576, 48x48 cells, same 12 rows as before (pickaxe, axe, hoe, water x side/down/up); `npc_mina.png`, `npc_rangga.png`, `npc_ayu.png`.
+- Code: `farmArt.js` (new row map, walk loop of 4 frames at 8 fps, idle of 2 frames at 2 fps, `npcIdleAnim`), `assets.js` (NPC manifest keys; the female files are chosen from the save's gender; switching character on New game reloads the art), `npcs.js` (`sprite` key per villager; `tint` only a fallback), `VillageScene.js` (own sheet per villager, portrait uses it).
+- Villagers: Mina = travelling_merchant, Rangga = rancher, Ayu = vet. To swap one, re-run the converter with another name in `NPC_FILES`.
+- Chop/mine/hoe/water poses use pack frame 1 (wind-up) and frame 3 (strike), iron-tier tools. Planting/harvest still use the crouch effect.
+- Checked in a script: every converted cell has its feet on row 25 (walk) / row 33 (actions), so collider, depth and tool overlay line up. NOT run in a browser: please test on the phone.
+- Known: fishing pose keeps the old rod overlay (positions may need a nudge); NPCs only idle (no walking yet); Cute Fantasy characters are no longer used.
+- NEXT: Step A2 (item icons + crop stages). Decision still needed: Corn / Tomato substitutes.
 
 ## DECISIONS
 - Item, crop, place and NPC names stay English in both languages; only UI text / dialogue is translated.
@@ -298,5 +284,3 @@ Internal resolution 480x270, 16x16 tiles, landscape only.
 - Crops only grow on the dirt field tiles (the brown patch east of the shed).
 - Mine ores (Step 4.2): Stone, Copper Ore, Gold Ore, Aquamarine, Ruby, Emerald, Amethyst (no iron/coal: the pack has none).
 - Prop asset keys must be unique across Beach/Forest/Mine (`prop_<name>`): Mine rock is `mine_rock_big`.
-- Festival names stay English in both languages; game names and all texts are translated (EN + ID).
-- Festival days never block normal play: Farm, Beach, Forest and Mine work as usual.

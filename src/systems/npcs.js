@@ -1,11 +1,11 @@
 // The three Brightfield villagers. NPC names stay English in both languages.
-// Until the paid art pack arrives they reuse the player sheet with a colour tint
-// (ASSET_MANIFEST key `player`), so swapping in real sheets is one line each.
+// Art (Step A1): each villager has its own 32x32 sheet (`sprite` = ASSET_MANIFEST key).
+// `tint` is only the fallback colour used when that sheet is missing.
 
 export const NPCS = {
-  mina: { name: 'Mina', tint: 0xffc9a0, role: 'shop', lines: ['npc.mina.1', 'npc.mina.2', 'npc.mina.3'] },
-  rangga: { name: 'Rangga', tint: 0x9ad5ff, lines: ['npc.rangga.1', 'npc.rangga.2', 'npc.rangga.3'] },
-  ayu: { name: 'Ayu', tint: 0xd7b0ff, lines: ['npc.ayu.1', 'npc.ayu.2', 'npc.ayu.3'] }
+  mina: { name: 'Mina', sprite: 'npc_mina', tint: 0xffc9a0, role: 'shop', lines: ['npc.mina.1', 'npc.mina.2', 'npc.mina.3'] },
+  rangga: { name: 'Rangga', sprite: 'npc_rangga', tint: 0x9ad5ff, lines: ['npc.rangga.1', 'npc.rangga.2', 'npc.rangga.3'] },
+  ayu: { name: 'Ayu', sprite: 'npc_ayu', tint: 0xd7b0ff, lines: ['npc.ayu.1', 'npc.ayu.2', 'npc.ayu.3'] }
 };
 
 export const MAX_HEARTS = 10;

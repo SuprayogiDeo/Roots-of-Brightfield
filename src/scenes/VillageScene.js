@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { t } from '../i18n/index.js';
 import { makeText, goTo } from '../systems/ui.js';
 import { applyWarmTint, preloadAssets } from '../systems/assets.js';
-import { createFarmTileset, createPlayerTextures, setPlayerDir, usingRealPlayer } from '../systems/farmArt.js';
+import { createFarmTileset, createPlayerTextures, setPlayerDir, usingRealPlayer, npcIdleAnim } from '../systems/farmArt.js';
 import TouchControls from '../systems/touchControls.js';
 import Hud, { HOTBAR_SIZE } from '../systems/hud.js';
 import { loadSave, writeSave } from '../systems/save.js';
@@ -11,8 +11,6 @@ import { createNightOverlay, updateDayNight } from '../systems/daynight.js';
 import Dialogue from '../systems/dialogue.js';
 import { NPCS, greet, lineFor } from '../systems/npcs.js';
 import { createWeatherFx } from '../systems/weatherFx.js';
-import { playMusicFor } from '../systems/music.js';
-import { createVillageFestival } from '../systems/festivalVillage.js';
 import { announceQuest, refreshTracker, flushQueuedQuests } from '../systems/questUi.js';
 import { questEvent, offerFor, activeFor, canDeliver, deliver, startQuest } from '../systems/quests.js';
 
@@ -28,7 +26,7 @@ export default class VillageScene extends Phaser.Scene {
   }
 
   preload() {
-    preloadAssets(this, ['map_village', 'tiles_farm', 'player', ...SFX_KEYS]);
+    preloadAssets(this, ['map_village', 'tiles_farm', 'player', 'npc_mina', 'npc_rangga', 'npc_ayu', ...SFX_KEYS]);
   }
 
   create() {
@@ -37,7 +35,6 @@ export default class VillageScene extends Phaser.Scene {
     if (!save) { this.scene.start('Title'); return; }
     this.save = save;
     this.gender = save.player.gender;
-    playMusicFor(this, 'village', save);
 
     this.cameras.main.fadeIn(250, 0, 0, 0);
     createFarmTileset(this);
@@ -63,14 +60,17 @@ export default class VillageScene extends Phaser.Scene {
     if (p && p.map === 'village' && typeof p.x === 'number') start = p;
     else if (p && p.from) start = point(`from_${p.from}`) || start;
 
-    // villagers (placeholder art: the player sheet with a colour tint)
+    // villagers: own sheet each (Step A1); falls back to the tinted player sheet if a file is missing
     this.npcs = {};
     Object.keys(NPCS).forEach((id) => {
       const pos = point(`npc_${id}_pos`);
       if (!pos) return;
-      const spr = this.add.sprite(pos.x, pos.y, 'player', 0).setTint(NPCS[id].tint);
+      const own = this.textures.exists(NPCS[id].sprite);
+      const spr = this.add.sprite(pos.x, pos.y, own ? NPCS[id].sprite : 'player', 0);
+      if (!own) spr.setTint(NPCS[id].tint);
       spr.setDepth(pos.y + 8);
-      if (this.anims.exists('pl_idle_down')) spr.play('pl_idle_down');
+      if (own) spr.play(npcIdleAnim(this, NPCS[id].sprite));
+      else if (this.anims.exists('pl_idle_down')) spr.play('pl_idle_down');
       this.npcs[id] = spr;
     });
 
@@ -102,8 +102,6 @@ export default class VillageScene extends Phaser.Scene {
     this.pendingQuest = []; // quest results shown once the dialogue box closes
     refreshTracker(this);
     flushQueuedQuests(this);
-    this.festival = createVillageFestival(this); // null on a normal day
-    if (this.festival) this.festival.welcome();
     this.controls = new TouchControls(this, {
       onA: () => this.pressA(),
       onB: () => this.hud.nextRow()
@@ -147,7 +145,6 @@ export default class VillageScene extends Phaser.Scene {
     if (action === 'to_farm') this.travel('farm');
     else if (action === 'shop') this.openShop();
     else if (action && action.startsWith('npc:')) this.talk(action.slice(4));
-    else if (action && action.startsWith('fest:') && this.festival) this.festival.act(action.slice(5));
   }
 
   talk(id) {
@@ -183,7 +180,8 @@ export default class VillageScene extends Phaser.Scene {
     this.dialogue.show({
       name: def.name,
       hearts: res.hearts,
-      tint: def.tint,
+      textureKey: this.textures.exists(def.sprite) ? def.sprite : undefined,
+      tint: this.textures.exists(def.sprite) ? undefined : def.tint,
       lines,
       choices,
       onChoice: (v) => {
@@ -220,7 +218,6 @@ export default class VillageScene extends Phaser.Scene {
   promptFor(action) {
     if (action === 'to_farm') return t('prompt.toFarm');
     if (action === 'shop') return t('prompt.shop');
-    if (action && action.startsWith('fest:')) return this.festival ? this.festival.prompt(action.slice(5)) : null;
     if (action && action.startsWith('npc:')) {
       const def = NPCS[action.slice(4)];
       return def ? t('prompt.talk', { name: def.name }) : null;

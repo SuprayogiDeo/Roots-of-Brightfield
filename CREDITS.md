@@ -92,34 +92,9 @@ Used for: crop growth stages.
   Unmodified 16x16 cells (nodes trimmed to their pixels). Not used yet: metal bars and swords on the same sheet.
 - Torches and their glow are drawn in code (no art file).
 
-### Kitchen and food icons (Step 4.6b)
-- `public/assets/kitchen/stove.png` — **Cooking & Kitchen Icons Pack** (license: CC0). Author/URL: TODO fill in from the download page.
-- `public/assets/items/sambal.png` — **Pixel Art Food Icons FREE** (soup_1), downscaled to 16x16.
-- `public/assets/items/coffee.png` — **Pixel Art Food Pack** (Cup of coffee), downscaled to 16x16.
-- **Author and license of the last two: NOT VERIFIED** (no license text in the zips). TODO: open the original download
-  pages and fill in author, URL and license before publishing.
-- Still code-drawn placeholders: Salted Egg, Salt, Coffee Beans icons.
-
-### Background music (Step 5.2) — **AUTHOR / SOURCE / LICENSE: NOT VERIFIED (TODO, fill in before publishing)**
-Files in `public/assets/audio/music/` (MP3, 96 kbps stereo, loudness-normalised to about -20 LUFS; converted from the
-WAV files the project owner supplied under the original names):
-| File | Original file | Plays in | Author | Source URL | License |
-|---|---|---|---|---|---|
-| `snow_song.mp3` | `snow_song.wav` | Winter (Farm, Village, Beach, Forest) | TODO | TODO | TODO |
-| `into_the_snow.mp3` | `into_the_snow.wav` | Winter (Farm, Village, Beach, Forest) | TODO | TODO | TODO |
-| `track_5.mp3` | `track_5.wav` | Village, Festival days, Spring/Summer/Fall (2nd song elsewhere) | TODO | TODO | TODO |
-| `track_7.mp3` | `track_7.wav` | Farm, Beach, Forest in Spring/Summer/Fall (2nd song in the Village) | TODO | TODO | TODO |
-- New songs later: add the file + one line in `MUSIC_TRACKS` (`src/systems/music.js`) and one row in this table.
-
-### Festivals and mini-games (Step 5.2)
-- No external art or sound: stalls, bunting and the race / cracker mini-games are drawn in code; sounds reuse the Kenney SFX above.
-
-### Player sprites (Step A1) — Cozy Lands (Basic pack) by **Amo-QAQ** (amo-qaq.itch.io)
-- Files: `public/assets/characters/cozy/` = `boy_idle/walk`, `girl_idle/walk/hoe/chop/mine/water` (unmodified copies of the pack's `Characters/boy` and `Characters/girl` sheets, 48x48 frames).
-- **License: FREE version = NON-COMMERCIAL use only.** Modifying is allowed; no NFTs, no AI training; do not resell/redistribute the pack itself. Commercial use needs the PREMIUM version (US$2.99+) — **buy it (or switch art) BEFORE any paid/monetised release.**
-- Credit: Amo-QAQ. If published on itch.io, link back to the pack.
-- The boy's tool actions are code-drawn (his idle pose + lean/lunge + small tool glyphs); no Cozy art exists for them.
-- The old Cute Fantasy `player.png` / `player_actions.png` stay as fallback (and as NPC/portrait art).
+### Characters and villagers (Step A1)
+- `public/assets/characters/player.png`, `player_f.png`, `player_actions.png`, `player_actions_f.png`, `npc_mina.png`, `npc_rangga.png`, `npc_ayu.png` — from **Farm & Ranch Life (pack 6)**: player_overalls and player_girl_overalls (walk/idle and hoe, water, chop, mine actions) and the travelling merchant, rancher and vet villagers. Re-sliced and re-arranged into the game's sheet layout (`tools/convert_pack6_characters.py`); art unchanged. Author: TODO (name is not in the pack files; read the download page). License: commercial use and edits allowed; no resale or redistribution of the files; no AI training (see the pack's LICENSE.txt).
+- The earlier Cute Fantasy player sheets are no longer used.
 
 ### Not used yet (kept out of the repo until needed)
 - The rest of **Sunnyside World** (village, NPCs, UI) — planned for Phase 2.

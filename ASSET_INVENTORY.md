@@ -86,7 +86,3 @@ Legend: OK = direct file. RECOLOR = nearest item, recolor allowed by both licens
 - A2 (icons/crops): crop growth strips are 8 frames (game currently uses fewer stages): map stages in crops.js without changing growth days.
 - A5/A6 (maps): Cozy autotiles + `Tile Rules.png`; Cozy houses are 7x5 tiles.
 - CREDITS.md: add Cozy Lands (Amo-QAQ, non-commercial free version) and pack 6 (author TODO).
-
-## Update Step A1
-- Used now: Cozy `Characters/boy` (idle, walk) and `Characters/girl` (idle, walk, hoe, chop, mine, water) as the player. `girl_hold*` not used yet. Pack 6 humans NOT used for the player (style mismatch).
-- Cozy sheet layout: 48x48 frames, 4 cols; rows up 0 / down 2 / left 4 / right 6 (odd rows duplicate or extra); water = 3 rows per direction.

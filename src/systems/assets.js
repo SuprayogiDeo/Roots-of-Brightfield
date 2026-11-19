@@ -30,12 +30,6 @@ export const FISH_IDS = [
   'fish_sardine', 'fish_mackerel', 'fish_bass', 'fish_catfish', 'fish_snapper', 'fish_golden_carp'
 ];
 
-// Cozy Lands player sheets: cl_<girl|boy>_<action>. Boy only has idle + walk.
-export const COZY_KEYS = [
-  'cl_girl_idle', 'cl_girl_walk', 'cl_girl_hoe', 'cl_girl_chop', 'cl_girl_mine', 'cl_girl_water',
-  'cl_boy_idle', 'cl_boy_walk'
-];
-
 export const ASSET_MANIFEST = {
   // Tiled map (real file). Tile ids inside it match the tileset below.
   map_farm: { type: 'tilemap', src: 'assets/maps/farm.json' },
@@ -46,11 +40,12 @@ export const ASSET_MANIFEST = {
   soil_dry: { type: 'image', src: 'assets/tiles/soil_dry.png' },
   soil_wet: { type: 'image', src: 'assets/tiles/soil_wet.png' },
   player: { type: 'spritesheet', src: 'assets/characters/player.png', frameWidth: 32, frameHeight: 32 },
-  // Player — Cozy Lands (Basic pack): 48x48 frames, 4 cols; rows up=0 down=2 left=4 right=6 (water: 3 rows/dir).
-  // Missing files -> falls back to the Cute Fantasy `player` sheet (see farmArt.js).
-  ...Object.fromEntries(COZY_KEYS.map((k) => [k, { type: 'spritesheet', src: `assets/characters/cozy/${k.slice(3)}.png`, frameWidth: 48, frameHeight: 48 }])),
   // Tool / action poses (Step 4.3): 48x48 frames, 2 columns (wind-up, strike), 12 rows. See systems/toolAnim.js.
   player_actions: { type: 'spritesheet', src: 'assets/characters/player_actions.png', frameWidth: 48, frameHeight: 48 },
+  // Villagers (Step A1): same 32x32 sheet layout as the player.
+  npc_mina: { type: 'spritesheet', src: 'assets/characters/npc_mina.png', frameWidth: 32, frameHeight: 32 },
+  npc_rangga: { type: 'spritesheet', src: 'assets/characters/npc_rangga.png', frameWidth: 32, frameHeight: 32 },
+  npc_ayu: { type: 'spritesheet', src: 'assets/characters/npc_ayu.png', frameWidth: 32, frameHeight: 32 },
 
   // Crop growth stages — Sunnyside World, one 16x16 frame per stage.
   cropsheet_carrot: { type: 'spritesheet', src: 'assets/crops/carrot.png', frameWidth: 16, frameHeight: 16 },
@@ -121,16 +116,38 @@ export function hasRealAsset(key) {
 
 // Queue the real files for the given keys (call from a scene's preload()).
 // Keys without a manifest entry are skipped -> the scene draws a placeholder.
+// Female player art lives in <name>_f.png; the gender comes from the save (read directly so
+// this file does not import the save module).
+const GENDER_FILES = ['player', 'player_actions'];
+const PLAYER_ANIMS = ['down', 'side', 'up'].flatMap((d) => [`pl_walk_${d}`, `pl_idle_${d}`]);
+let loadedGender = null;
+
+function savedGender() {
+  try {
+    const raw = localStorage.getItem('roots_of_brightfield_save');
+    const g = raw && JSON.parse(raw).player && JSON.parse(raw).player.gender;
+    return g === 'female' ? 'female' : 'male';
+  } catch (e) { return 'male'; }
+}
+
 export function preloadAssets(scene, keys) {
-  if (keys.includes('player')) keys = [...keys, ...COZY_KEYS]; // every scene with a player also needs the Cozy sheets
+  if (keys.some((k) => GENDER_FILES.includes(k))) {
+    const g = savedGender();
+    if (loadedGender && loadedGender !== g) { // a different character than the one already loaded (New game)
+      GENDER_FILES.forEach((k) => { if (scene.textures.exists(k)) scene.textures.remove(k); });
+      PLAYER_ANIMS.forEach((k) => { if (scene.anims.exists(k)) scene.anims.remove(k); });
+    }
+    loadedGender = g;
+  }
   keys.forEach((key) => {
     const a = ASSET_MANIFEST[key];
     if (!a || scene.textures.exists(key) || scene.cache.tilemap.exists(key)
       || scene.cache.audio.exists(key)) return;
+    const src = GENDER_FILES.includes(key) && loadedGender === 'female' ? a.src.replace('.png', '_f.png') : a.src;
     if (a.type === 'tilemap') scene.load.tilemapTiledJSON(key, a.src);
     else if (a.type === 'audio') scene.load.audio(key, a.src);
     else if (a.type === 'spritesheet') {
-      scene.load.spritesheet(key, a.src, { frameWidth: a.frameWidth, frameHeight: a.frameHeight });
+      scene.load.spritesheet(key, src, { frameWidth: a.frameWidth, frameHeight: a.frameHeight });
     } else scene.load.image(key, a.src);
   });
 }
